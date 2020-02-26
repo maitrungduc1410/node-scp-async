@@ -1,7 +1,7 @@
 # New SCP module for NodeJS
-A lightweight, fast and secure module to perform Scp command for NodeJS based on SSH2
+A lightweight, fast and secure module to perform SCP commands for NodeJS based on SSH2
 # What's new
-All functionalities are Promise. That means you can use it with `Promise` or `Async/Await` (No more callback hell, Yeah :) )
+All functionalities are written using Promise. That means you can use it with `Promise` or `Async/Await` (No more callback hell, Yeah :) )
 
 And other new features:
 - Scp a directory from local to remote server and from remote to local
@@ -17,9 +17,9 @@ yarn install node-scp
 ## Scp file from local to remote server
 Using `Promise`
 ```js
-const client = require('node-scp')
+const scp = require('node-scp')
 
-client({
+scp({
   host: 'your host',
   port: 22,
   username: 'username',
@@ -35,9 +35,9 @@ client({
 
 Using `async/await`:
 ```js
-const client = require('node-scp')
+const scp = require('node-scp')
 
-const c = await client({
+const c = await scp({
   host: 'your host',
   port: 22,
   username: 'username',
@@ -50,9 +50,9 @@ c.close() // remember to close connection after you finish
 ## Scp file from remote server to local
 Using `Promise`
 ```js
-const client = require('node-scp')
+const scp = require('node-scp')
 
-client({
+scp({
   host: 'your host',
   port: 22,
   username: 'username',
@@ -68,24 +68,31 @@ client({
 
 Using `async/await`:
 ```js
-const client = require('node-scp')
+const scp = require('node-scp')
 
-const c = await client({
-  host: 'your host',
-  port: 22,
-  username: 'username',
-  password: 'password',
-})
-await c.downloadFile('/workspace/test.txt', './test.txt')
-c.close() // remember to close connection after you finish
+async function test () {
+  try {
+    const client = await scp({
+      host: 'your host',
+      port: 22,
+      username: 'username',
+      password: 'password',
+    })
+    await client.downloadFile('/workspace/test.txt', './test.txt')
+    client.close() // remember to close connection after you finish
+  } catch(e) {
+    console.log(e)
+  }
+}
+
 ```
 
 ## Scp a directory from local to remote server
 Using `Promise`
 ```js
-const client = require('node-scp')
+const scp = require('node-scp')
 
-client({
+scp({
   host: 'your host',
   port: 22,
   username: 'username',
@@ -101,24 +108,30 @@ client({
 
 Using `async/await`:
 ```js
-const client = require('node-scp')
+const scp = require('node-scp')
 
-const c = await client({
-  host: 'your host',
-  port: 22,
-  username: 'username',
-  password: 'password',
-})
-await c.uploadDir('./local/dir', '/server/path')
-c.close() // remember to close connection after you finish
+async funtion test () {
+  try {
+    const client = await scp({
+      host: 'your host',
+      port: 22,
+      username: 'username',
+      password: 'password',
+    })
+    await client.uploadDir('./local/dir', '/server/path')
+    client.close() // remember to close connection after you finish
+  } catch (e) {
+    console.log(e)
+  }
+}
 ```
 
 ## Create a directory on remote server
 Using `Promise`
 ```js
-const client = require('node-scp')
+const scp = require('node-scp')
 
-client({
+scp({
   host: 'your host',
   port: 22,
   username: 'username',
@@ -134,25 +147,30 @@ client({
 
 Using `async/await`:
 ```js
-const client = require('node-scp')
+const scp = require('node-scp')
 
-const c = await client({
-  host: 'your host',
-  port: 22,
-  username: 'username',
-  password: 'password',
-})
-await c.mkdir('/server/path')
-c.close() // remember to close connection after you finish
+async function test() {
+  try {
+    const client = await scp({
+      host: 'your host',
+      port: 22,
+      username: 'username',
+      password: 'password',
+    })
+    await client.mkdir('/server/path')
+    client.close() // remember to close connection after you finish
+  } catch (e) {
+    console.log(e)
+  }
+}
 ```
-
 
 ## Check if a path exists on remote server
 Using `Promise`
 ```js
-const client = require('node-scp')
+const scp = require('node-scp')
 
-client({
+scp({
   host: 'your host',
   port: 22,
   username: 'username',
@@ -168,24 +186,28 @@ client({
 
 Using `async/await`:
 ```js
-const client = require('node-scp')
+const scp = require('node-scp')
 
-const c = await client({
-  host: 'your host',
-  port: 22,
-  username: 'username',
-  password: 'password',
-})
-await c.exists('/server/path')
-c.close() // remember to close connection after you finish
+try {
+  const client = await scp({
+    host: 'your host',
+    port: 22,
+    username: 'username',
+    password: 'password',
+  })
+  await client.exists('/server/path')
+  client.close() // remember to close connection after you finish
+} catch (e) {
+  console.log(e)
+}
 ```
 
 ## Get stats of a path on remote server
 Using `Promise`
 ```js
-const client = require('node-scp')
+const scp = require('node-scp')
 
-client({
+scp({
   host: 'your host',
   port: 22,
   username: 'username',
@@ -201,16 +223,20 @@ client({
 
 Using `async/await`:
 ```js
-const client = require('node-scp')
+const scp = require('node-scp')
 
-const c = await client({
-  host: 'your host',
-  port: 22,
-  username: 'username',
-  password: 'password',
-})
-await c.stat('/server/path')
-c.close() // remember to close connection after you finish
+try {
+  const client = await scp({
+    host: 'your host',
+    port: 22,
+    username: 'username',
+    password: 'password',
+  })
+  await client.stat('/server/path')
+  client.close() // remember to close connection after you finish
+} catch (e) {
+  console.log(e)
+}
 ```
 
 # Support
