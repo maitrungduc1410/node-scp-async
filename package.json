@@ -1,5 +1,6 @@
 {
   "name": "node-scp",
+  "description": "Lightweight, fast and secure SCP function for NodeJS",
   "version": "0.0.2",
   "main": "./lib/index.js",
   "files": [
@@ -8,6 +9,7 @@
   ],
   "types": "./lib/index.d.ts",
   "license": "MIT",
+  "repository": "git+https://github.com/maitrungduc1410/node-scp-async.git",
   "scripts": {
     "watch": "tsc -w",
     "build": "tsc"
