@@ -1,17 +1,21 @@
 {
-  "name": "shell-module",
-  "version": "0.0.1",
-  "main": "index.js",
+  "name": "node-scp",
+  "version": "0.0.2",
+  "main": "./lib/index.js",
+  "files": [
+    "lib/",
+    "LICENSE"
+  ],
+  "types": "./lib/index.d.ts",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon ./lib/index.js",
-    "watch": "tsc -w"
+    "watch": "tsc -w",
+    "build": "tsc"
   },
   "dependencies": {
     "ssh2": "^0.8.8"
   },
   "devDependencies": {
-    "@types/ssh2": "^0.5.40",
-    "nodemon": "^2.0.2"
+    "@types/ssh2": "^0.5.40"
   }
 }
