@@ -37,14 +37,22 @@ Using `async/await`:
 ```js
 const scp = require('node-scp')
 
-const c = await scp({
-  host: 'your host',
-  port: 22,
-  username: 'username',
-  password: 'password',
-})
-await c.uploadFile('./test.txt', '/workspace/test.txt')
-c.close() // remember to close connection after you finish
+async function test() {
+  try {
+    const c = await scp({
+      host: 'your host',
+      port: 22,
+      username: 'username',
+      password: 'password',
+    })
+    await c.uploadFile('./test.txt', '/workspace/test.txt')
+    c.close() // remember to close connection after you finish
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+test()
 ```
 
 ## Scp file from remote server to local
@@ -85,6 +93,7 @@ async function test () {
   }
 }
 
+test()
 ```
 
 ## Scp a directory from local to remote server
@@ -124,6 +133,8 @@ async funtion test () {
     console.log(e)
   }
 }
+
+test()
 ```
 
 ## Create a directory on remote server
@@ -163,6 +174,8 @@ async function test() {
     console.log(e)
   }
 }
+
+test()
 ```
 
 ## Check if a path exists on remote server
@@ -187,19 +200,22 @@ scp({
 Using `async/await`:
 ```js
 const scp = require('node-scp')
-
-try {
-  const client = await scp({
-    host: 'your host',
-    port: 22,
-    username: 'username',
-    password: 'password',
-  })
-  await client.exists('/server/path')
-  client.close() // remember to close connection after you finish
-} catch (e) {
-  console.log(e)
+async function test() {
+  try {
+    const client = await scp({
+      host: 'your host',
+      port: 22,
+      username: 'username',
+      password: 'password',
+    })
+    await client.exists('/server/path')
+    client.close() // remember to close connection after you finish
+  } catch (e) {
+    console.log(e)
+  }
 }
+
+test()
 ```
 
 ## Get stats of a path on remote server
@@ -225,18 +241,22 @@ Using `async/await`:
 ```js
 const scp = require('node-scp')
 
-try {
-  const client = await scp({
-    host: 'your host',
-    port: 22,
-    username: 'username',
-    password: 'password',
-  })
-  await client.stat('/server/path')
-  client.close() // remember to close connection after you finish
-} catch (e) {
-  console.log(e)
+async function test() {
+  try {
+    const client = await scp({
+      host: 'your host',
+      port: 22,
+      username: 'username',
+      password: 'password',
+    })
+    await client.stat('/server/path')
+    client.close() // remember to close connection after you finish
+  } catch (e) {
+    console.log(e)
+  }
 }
+
+test()
 ```
 
 # Support
