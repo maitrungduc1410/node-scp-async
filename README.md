@@ -260,4 +260,4 @@ test()
 ```
 
 # Support
-If you like this project, give me 1 👍
+If you like this project, give me 1 ⭐️
