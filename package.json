@@ -1,0 +1,17 @@
+{
+  "name": "shell-module",
+  "version": "0.0.1",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon ./lib/index.js",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "ssh2": "^0.8.8"
+  },
+  "devDependencies": {
+    "@types/ssh2": "^0.5.40",
+    "nodemon": "^2.0.2"
+  }
+}
