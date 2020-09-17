@@ -31,13 +31,14 @@
   ],
   "scripts": {
     "watch": "tsc -w",
+    "patch-release": "npm version patch && npm publish && git push --follow-tags",
     "build": "tsc"
   },
   "peerDependencies": {
-    "ssh2": "^0.8.8"
+    "ssh2": "^0.8.9"
   },
   "devDependencies": {
-    "@types/ssh2": "^0.5.40",
-    "typescript": "^3.8.2"
+    "@types/ssh2": "^0.5.44",
+    "typescript": "^4.0.2"
   }
 }

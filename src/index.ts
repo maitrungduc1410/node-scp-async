@@ -1,8 +1,8 @@
+import { EventEmitter } from 'events'
 import fs from 'fs'
 import path from 'path'
 import { Client as SSHClient, SFTPWrapper } from 'ssh2'
 import { Stats } from 'ssh2-streams'
-import { EventEmitter } from 'events'
 
 export interface IScpOptions {
   host?: string
@@ -35,8 +35,8 @@ export class ScpClient extends EventEmitter {
       this.emit('error', err)
     })
     ssh.on('end', () => {
-    this.emit('end')
-  })
+      this.emit('end')
+    })
     ssh.on('close', () => {
       this.emit('close')
     })
