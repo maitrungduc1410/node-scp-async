@@ -1,20 +1,39 @@
 {
   "name": "node-scp",
+  "title": "SCP module for NodeJS",
   "description": "Lightweight, fast and secure SCP function for NodeJS",
-  "version": "0.0.3",
-  "main": "./lib/index.js",
-  "files": [
-    "lib/",
-    "LICENSE"
-  ],
-  "types": "./lib/index.d.ts",
+  "version": "0.0.4",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "license": "MIT",
-  "repository": "git+https://github.com/maitrungduc1410/node-scp-async.git",
+  "licenseFilename": "LICENSE",
+  "readmeFilename": "README.md",
+  "author": {
+    "name": "Mai Trung Duc",
+    "email": "maitrungduc1410@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maitrungduc1410/node-scp-async.git",
+    "baseUrl": "https://github.com/maitrungduc1410/node-scp-async"
+  },
+  "bugs": {
+    "url": "https://github.com/maitrungduc1410/node-scp-async/issues"
+  },
+  "homepage": "https://github.com/maitrungduc1410/node-scp-async",
+  "keywords": [
+    "node scp",
+    "node scp async",
+    "node-scp",
+    "node-scp-async",
+    "scp node",
+    "scp nodejs"
+  ],
   "scripts": {
     "watch": "tsc -w",
     "build": "tsc"
   },
-  "dependencies": {
+  "peerDependencies": {
     "ssh2": "^0.8.8"
   },
   "devDependencies": {
