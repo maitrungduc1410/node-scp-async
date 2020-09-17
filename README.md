@@ -11,7 +11,7 @@ And other new features:
 ```
 npm install --save node-scp
 # or
-yarn install node-scp
+yarn add node-scp
 ```
 # Guide
 ## Scp file from local to remote server
