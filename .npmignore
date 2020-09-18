@@ -3,3 +3,4 @@ src
 .git*
 tsconfig.json
 tslint.json
+test.js

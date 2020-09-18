@@ -7,7 +7,19 @@ And other new features:
 - Scp a directory from local to remote server and from remote to local
 - Perform commands on remote server: `mkdir`, `stat`, check if path exists
 
-# Install
+# Table of Contents
+
+* [Installation](#installation)
+* [Guide](#guide)
+  * [Scp file from local to remote server](#scp-file-from-local-to-remote-server)
+  * [Scp file from remote server to local](#Scp-file-from-remote-server-to-local)
+  * [Scp a directory from local to remote server](#Scp-a-directory-from-local-to-remote-server)
+  * [Create a directory on remote server](#Create-a-directory-on-remote-server)
+  * [Check if a path exists on remote server](#Check-if-a-path-exists-on-remote-server)
+  * [Get stats of a path on remote server](#Get-stats-of-a-path-on-remote-server)
+  * [Connection options](#Connection-options)
+
+# Installation
 ```
 npm install --save node-scp
 # or
@@ -24,6 +36,8 @@ scp({
   port: 22,
   username: 'username',
   password: 'password',
+  // privateKey: fs.readFileSync('./key.pem'),
+  // passphrase: 'your key passphrase',
 }).then(client => {
   client.uploadFile('./test.txt', '/workspace/test.txt')
         .then(response => {
@@ -44,6 +58,8 @@ async function test() {
       port: 22,
       username: 'username',
       password: 'password',
+      // privateKey: fs.readFileSync('./key.pem'),
+      // passphrase: 'your key passphrase',
     })
     await c.uploadFile('./test.txt', '/workspace/test.txt')
     c.close() // remember to close connection after you finish
@@ -65,6 +81,8 @@ scp({
   port: 22,
   username: 'username',
   password: 'password',
+  // privateKey: fs.readFileSync('./key.pem'),
+  // passphrase: 'your key passphrase',
 }).then(client => {
   client.downloadFile('/workspace/test.txt', './test.txt')
         .then(response => {
@@ -85,6 +103,8 @@ async function test () {
       port: 22,
       username: 'username',
       password: 'password',
+      // privateKey: fs.readFileSync('./key.pem'),
+      // passphrase: 'your key passphrase',
     })
     await client.downloadFile('/workspace/test.txt', './test.txt')
     client.close() // remember to close connection after you finish
@@ -106,6 +126,8 @@ scp({
   port: 22,
   username: 'username',
   password: 'password',
+  // privateKey: fs.readFileSync('./key.pem'),
+  // passphrase: 'your key passphrase',
 }).then(client => {
   client.uploadDir('./local/dir', '/server/path')
         .then(response => {
@@ -126,6 +148,8 @@ async funtion test () {
       port: 22,
       username: 'username',
       password: 'password',
+      // privateKey: fs.readFileSync('./key.pem'),
+      // passphrase: 'your key passphrase',
     })
     await client.uploadDir('./local/dir', '/server/path')
     client.close() // remember to close connection after you finish
@@ -147,6 +171,8 @@ scp({
   port: 22,
   username: 'username',
   password: 'password',
+  // privateKey: fs.readFileSync('./key.pem'),
+  // passphrase: 'your key passphrase',
 }).then(client => {
   client.mkdir('/server/path')
         .then(response => {
@@ -167,6 +193,8 @@ async function test() {
       port: 22,
       username: 'username',
       password: 'password',
+      // privateKey: fs.readFileSync('./key.pem'),
+      // passphrase: 'your key passphrase',
     })
     await client.mkdir('/server/path')
     client.close() // remember to close connection after you finish
@@ -188,6 +216,8 @@ scp({
   port: 22,
   username: 'username',
   password: 'password',
+  // privateKey: fs.readFileSync('./key.pem'),
+  // passphrase: 'your key passphrase',
 }).then(client => {
   client.exists('/server/path')
         .then(response => {
@@ -207,6 +237,8 @@ async function test() {
       port: 22,
       username: 'username',
       password: 'password',
+      // privateKey: fs.readFileSync('./key.pem'),
+      // passphrase: 'your key passphrase',
     })
     await client.exists('/server/path')
     client.close() // remember to close connection after you finish
@@ -228,6 +260,8 @@ scp({
   port: 22,
   username: 'username',
   password: 'password',
+  // privateKey: fs.readFileSync('./key.pem'),
+  // passphrase: 'your key passphrase',
 }).then(client => {
   client.stat('/server/path')
         .then(response => {
@@ -248,6 +282,8 @@ async function test() {
       port: 22,
       username: 'username',
       password: 'password',
+      // privateKey: fs.readFileSync('./key.pem'),
+      // passphrase: 'your key passphrase',
     })
     await client.stat('/server/path')
     client.close() // remember to close connection after you finish
@@ -258,6 +294,17 @@ async function test() {
 
 test()
 ```
+## Connection options
+Below are available options you can pass when connecting to server:
+- **host**: - *string* - Hostname or IP address of the server. **Default**: `localhost`
+- **port** - *integer* - Port number of the server. **Default**: `22`
+- **forceIPv4** - *boolean* - Only connect via resolved IPv4 address for `host`. **Default**: `false`
+- **forceIPv6** - *boolean* - Only connect via resolved IPv6 address for `host`. **Default**: `false`
+- **username** - *string* - Username for authentication. **Default**: (none)
+- **password** - *string* - Password for password-based user authentication. **Default**: (none)
+- **privateKey** - *mixed* - `Buffer` or `string` that contains a private key for either key-based or hostbased user authentication (OpenSSH format). **Default**: (none)
+- **passphrase** - *string* - For an encrypted private key, this is the passphrase used to decrypt it. **Default**: (none)
 
+**Default authentication method order**: None -> Password -> Private Key
 # Support
 If you like this project, give me 1 ⭐️

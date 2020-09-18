@@ -9,7 +9,10 @@ export interface IScpOptions {
   port?: number
   username?: string
   password?: string
-  paths?: string
+  privateKey?: Buffer | string
+  passphrase? : string
+  forceIPv4?: boolean
+  forceIPv6?: boolean
 }
 
 export class ScpClient extends EventEmitter {
