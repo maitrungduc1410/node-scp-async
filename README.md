@@ -53,7 +53,7 @@ const scp = require('node-scp')
 
 async function test() {
   try {
-    const c = await scp({
+    const client = await scp({
       host: 'your host',
       port: 22,
       username: 'username',
@@ -61,8 +61,10 @@ async function test() {
       // privateKey: fs.readFileSync('./key.pem'),
       // passphrase: 'your key passphrase',
     })
-    await c.uploadFile('./test.txt', '/workspace/test.txt')
-    c.close() // remember to close connection after you finish
+    await client.uploadFile('./test.txt', '/workspace/test.txt')
+    // you can perform upload multiple times
+    await client.uploadFile('./test1.txt', '/workspace/test1.txt')
+    client.close() // remember to close connection after you finish
   } catch (e) {
     console.log(e)
   }
