@@ -2,7 +2,7 @@
   "name": "node-scp",
   "title": "SCP module for NodeJS",
   "description": "Lightweight, fast and secure SCP function for NodeJS",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "license": "MIT",
@@ -31,7 +31,7 @@
   ],
   "scripts": {
     "watch": "tsc -w",
-    "patch-release": "npm version patch && npm publish && git push --follow-tags",
+    "prepublish": "npm --no-git-tag-version version patch",
     "build": "tsc"
   },
   "dependencies": {

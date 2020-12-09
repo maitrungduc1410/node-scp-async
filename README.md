@@ -306,7 +306,9 @@ Below are available options you can pass when connecting to server:
 - **password** - *string* - Password for password-based user authentication. **Default**: (none)
 - **privateKey** - *mixed* - `Buffer` or `string` that contains a private key for either key-based or hostbased user authentication (OpenSSH format). **Default**: (none)
 - **passphrase** - *string* - For an encrypted private key, this is the passphrase used to decrypt it. **Default**: (none)
-
+- **readyTimeout** - *integer* - FHow long (in milliseconds) to wait for the SSH handshake to complete. **Default**: `20000`
+- **keepaliveInterval** - *integer* - How often (in milliseconds) to send SSH-level keepalive packets to the server (in a similar way as OpenSSH's ServerAliveInterval config option). Set to 0 to disable. **Default**: `0`
+- **keepaliveCountMax** - *integer* -  How many consecutive, unanswered SSH-level keepalive packets that can be sent to the server before disconnection (similar to OpenSSH's ServerAliveCountMax config option). **Default**: `3`
 **Default authentication method order**: None -> Password -> Private Key
 # Support
 If you like this project, give me 1 ⭐️

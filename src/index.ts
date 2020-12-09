@@ -13,6 +13,9 @@ export interface IScpOptions {
   passphrase? : string
   forceIPv4?: boolean
   forceIPv6?: boolean
+  readyTimeout?: number
+  keepaliveInterval?: number
+  keepaliveCountMax?: number
 }
 
 export class ScpClient extends EventEmitter {
