@@ -14,9 +14,12 @@ And other new features:
   * [Scp file from local to remote server](#scp-file-from-local-to-remote-server)
   * [Scp file from remote server to local](#Scp-file-from-remote-server-to-local)
   * [Scp a directory from local to remote server](#Scp-a-directory-from-local-to-remote-server)
+  * [Scp a directory from remote server to local](#Scp-a-directory-from-remote-server-to-local)
   * [Create a directory on remote server](#Create-a-directory-on-remote-server)
   * [Check if a path exists on remote server](#Check-if-a-path-exists-on-remote-server)
   * [Get stats of a path on remote server](#Get-stats-of-a-path-on-remote-server)
+  * [List all files in remote directory](#List-all-files-in-remote-directory)
+  * [Convert relative path to absolute path on remote server](#Convert-relative-path-to-absolute-path-on-remote-server)
   * [Connection options](#Connection-options)
 
 # Installation
@@ -163,6 +166,51 @@ async funtion test () {
 test()
 ```
 
+## Scp a directory from remote server to local
+Using `Promise`
+```js
+const scp = require('node-scp')
+
+scp({
+  host: 'your host',
+  port: 22,
+  username: 'username',
+  password: 'password',
+  // privateKey: fs.readFileSync('./key.pem'),
+  // passphrase: 'your key passphrase',
+}).then(client => {
+  client.downloadDir('/server/path', 'local/path')
+        .then(response => {
+          client.close() // remember to close connection after you finish
+        })
+        .catch(error => {})
+}).catch(e => console.log(e))
+```
+
+Using `async/await`:
+```js
+const scp = require('node-scp')
+
+async funtion test () {
+  try {
+    const client = await scp({
+      host: 'your host',
+      port: 22,
+      username: 'username',
+      password: 'password',
+      // privateKey: fs.readFileSync('./key.pem'),
+      // passphrase: 'your key passphrase',
+    })
+    await client.downloadDir('./local/dir', '/server/path')
+    client.close() // remember to close connection after you finish
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+test()
+```
+
 ## Create a directory on remote server
 Using `Promise`
 ```js
@@ -221,8 +269,9 @@ scp({
   // privateKey: fs.readFileSync('./key.pem'),
   // passphrase: 'your key passphrase',
 }).then(client => {
-  client.exists('/server/path')
-        .then(response => {
+  const result = client.exists('/server/path')
+        .then(result => {
+          console.log(result)
           client.close() // remember to close connection after you finish
         })
         .catch(error => {})
@@ -242,7 +291,8 @@ async function test() {
       // privateKey: fs.readFileSync('./key.pem'),
       // passphrase: 'your key passphrase',
     })
-    await client.exists('/server/path')
+    const result = await client.exists('/server/path')
+    console.log(result)
     client.close() // remember to close connection after you finish
   } catch (e) {
     console.log(e)
@@ -266,7 +316,8 @@ scp({
   // passphrase: 'your key passphrase',
 }).then(client => {
   client.stat('/server/path')
-        .then(response => {
+        .then(result => {
+          console.log(result)
           client.close() // remember to close connection after you finish
         })
         .catch(error => {})
@@ -287,7 +338,8 @@ async function test() {
       // privateKey: fs.readFileSync('./key.pem'),
       // passphrase: 'your key passphrase',
     })
-    await client.stat('/server/path')
+    cosnt result = await client.stat('/server/path')
+    console.log(result)
     client.close() // remember to close connection after you finish
   } catch (e) {
     console.log(e)
@@ -296,6 +348,101 @@ async function test() {
 
 test()
 ```
+
+## List all files in remote directory
+Using `Promise`
+```js
+const scp = require('node-scp')
+
+scp({
+  host: 'your host',
+  port: 22,
+  username: 'username',
+  password: 'password',
+  // privateKey: fs.readFileSync('./key.pem'),
+  // passphrase: 'your key passphrase',
+}).then(client => {
+  client.list('/server/path')
+        .then(result => {
+          console.log(result)
+          client.close() // remember to close connection after you finish
+        })
+        .catch(error => {})
+}).catch(e => console.log(e))
+```
+
+Using `async/await`:
+```js
+const scp = require('node-scp')
+
+async function test() {
+  try {
+    const client = await scp({
+      host: 'your host',
+      port: 22,
+      username: 'username',
+      password: 'password',
+      // privateKey: fs.readFileSync('./key.pem'),
+      // passphrase: 'your key passphrase',
+    })
+    cosnt result = await client.list('/server/path')
+    console.log(result)
+    client.close() // remember to close connection after you finish
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+test()
+```
+
+## Convert relative path to absolute path on remote server
+Using `Promise`
+```js
+const scp = require('node-scp')
+
+scp({
+  host: 'your host',
+  port: 22,
+  username: 'username',
+  password: 'password',
+  // privateKey: fs.readFileSync('./key.pem'),
+  // passphrase: 'your key passphrase',
+}).then(client => {
+  client.realpath('/server/path')
+        .then(result => {
+          console.log(result)
+          client.close() // remember to close connection after you finish
+        })
+        .catch(error => {})
+}).catch(e => console.log(e))
+```
+
+Using `async/await`:
+```js
+const scp = require('node-scp')
+
+async function test() {
+  try {
+    const client = await scp({
+      host: 'your host',
+      port: 22,
+      username: 'username',
+      password: 'password',
+      // privateKey: fs.readFileSync('./key.pem'),
+      // passphrase: 'your key passphrase',
+    })
+    cosnt result = await client.realpath('/server/path')
+    console.log(result)
+    client.close() // remember to close connection after you finish
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+test()
+```
+
 ## Connection options
 Below are available options you can pass when connecting to server:
 - **host**: - *string* - Hostname or IP address of the server. **Default**: `localhost`
