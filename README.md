@@ -409,7 +409,7 @@ scp({
   // privateKey: fs.readFileSync('./key.pem'),
   // passphrase: 'your key passphrase',
 }).then(client => {
-  client.realpath('/server/path')
+  client.realPath('/server/path')
         .then(result => {
           console.log(result)
           client.close() // remember to close connection after you finish
@@ -432,7 +432,7 @@ async function test() {
       // privateKey: fs.readFileSync('./key.pem'),
       // passphrase: 'your key passphrase',
     })
-    cosnt result = await client.realpath('/server/path')
+    cosnt result = await client.realPath('/server/path')
     console.log(result)
     client.close() // remember to close connection after you finish
   } catch (e) {
