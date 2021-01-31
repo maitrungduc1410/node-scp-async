@@ -212,7 +212,7 @@ export function localAccess(localPath: string, mode: number): Promise<CheckResul
   return new Promise((resolve) => {
     fs.access(localPath, mode, (err) => {
       if (err) {
-        const {msg, code} = classifyError(err, localPath)
+        const { msg, code } = classifyError(err, localPath)
         resolve({
           path: localPath,
           valid: false,
@@ -482,7 +482,7 @@ export async function checkWriteFile(client: ScpClient, aPath: string, type: str
       code: errorCode.badPath
     }
   } else if (!type) {
-    const {root, dir} = path.parse(aPath)
+    const { root, dir } = path.parse(aPath)
     // let parentDir = path.parse(aPath).dir;
     if (!dir) {
       return {
@@ -541,7 +541,7 @@ export async function checkWriteDir(client: ScpClient, aPath: string, type: stri
       code: errorCode.badPath
     }
   } else if (!type) {
-    const {root, dir} = path.parse(aPath)
+    const { root, dir } = path.parse(aPath)
     if (root === dir) {
       return {
         path: aPath,
@@ -659,4 +659,12 @@ export function hasListener(emitter: EventEmitter, eventName: string, listenerNa
   const listeners = emitter.listeners(eventName)
   const matches = listeners.filter((l) => l.name === listenerName)
   return matches.length === 0 ? false : true
+}
+
+export function joinRemote(client: ScpClient, ...args: string[]) {
+  debugger
+  if (client.remotePathSep === '/') {
+    return path.posix.join(...args)
+  }
+  return path.win32.join(...args)
 }

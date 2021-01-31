@@ -12,7 +12,7 @@ export interface IScpOptions {
   username?: string
   password?: string
   privateKey?: Buffer | string
-  passphrase? : string
+  passphrase?: string
   forceIPv4?: boolean
   forceIPv6?: boolean
   readyTimeout?: number
@@ -94,6 +94,23 @@ export class ScpClient extends EventEmitter {
     })
   }
 
+  public async emptyDir(dir: string): Promise<void> {
+    utils.haveConnection(this, 'uploadDir')
+    try {
+      const isExist = await this.exists(dir)
+
+      if (!isExist) {
+        await this.mkdir(dir)
+      } else if (isExist === 'd') {
+        await this.rmdir(dir)
+        await this.mkdir(dir)
+      }
+    }
+    catch (error) {
+      throw error
+    }
+  }
+
   public async uploadDir(src: string, dest: string): Promise<void> {
     utils.haveConnection(this, 'uploadDir')
     try {
@@ -111,11 +128,11 @@ export class ScpClient extends EventEmitter {
       for (const e of dirEntries) {
         if (e.isDirectory()) {
           const newSrc = join(src, e.name)
-          const newDst = join(dest, e.name)
+          const newDst = utils.joinRemote(this, dest, e.name)
           await this.uploadDir(newSrc, newDst)
         } else if (e.isFile()) {
           const newSrc = join(src, e.name)
-          const newDst = join(dest, e.name)
+          const newDst = utils.joinRemote(this, dest, e.name)
           await this.uploadFile(newSrc, newDst)
 
           // this.client.emit('upload', {source: src, destination: dst})
@@ -145,7 +162,7 @@ export class ScpClient extends EventEmitter {
       const localInfo = await utils.checkLocalPath(localPath, targetType.writeDir)
 
       if (localInfo.valid && !localInfo.type) {
-        mkdirSync(localInfo.path, {recursive: true})
+        mkdirSync(localInfo.path, { recursive: true })
       }
 
       if (!localInfo.valid) {
@@ -161,7 +178,7 @@ export class ScpClient extends EventEmitter {
           const src = remoteInfo.path + this.remotePathSep + f.name
           const dst = join(localInfo.path, f.name)
           await this.downloadFile(src, dst)
-          this.sshClient!.emit('download', {source: src, destination: dst})
+          this.sshClient!.emit('download', { source: src, destination: dst })
         } else {
           console.log(`downloadDir: File ignored: ${f.name} not regular file`)
         }
@@ -183,6 +200,45 @@ export class ScpClient extends EventEmitter {
         }
       })
     })
+  }
+
+  public async unlink(remotePath: string): Promise<void> {
+    utils.haveConnection(this, 'unlink')
+    return new Promise((resolve, reject) => {
+      this.sftpWrapper!.unlink(remotePath, (err) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve()
+        }
+      })
+    })
+  }
+
+  // _rmdir - only works with an empty directory
+  async _rmdir(remotePath: string): Promise<void> {
+    return new Promise(async (resolve, reject) => {
+      this.sftpWrapper!.rmdir(remotePath, (err) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve()
+        }
+      })
+    })
+  }
+
+  public async rmdir(remotePath: string): Promise<void> {
+    const files = await this.list(remotePath)
+    for (const file of files) {
+      const fullFilename = utils.joinRemote(this, remotePath, file.name)
+      if (file.type === 'd') {
+        await this.rmdir(fullFilename)
+      } else {
+        await this.unlink(fullFilename)
+      }
+    }
+    await this._rmdir(remotePath)
   }
 
   public async mkdir(remotePath: string): Promise<void> {
