@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events'
 import { mkdirSync, readdirSync, existsSync } from 'fs'
-import { join } from 'path'
+import { join, win32, posix } from 'path'
 import { Client as SSHClient, SFTPWrapper } from 'ssh2'
 import { Stats } from 'ssh2-streams'
 import { targetType } from './constant'
@@ -18,12 +18,13 @@ export interface IScpOptions {
   readyTimeout?: number
   keepaliveInterval?: number
   keepaliveCountMax?: number
+  remoteOsType?: 'posix' | 'win32'
 }
 
 export class ScpClient extends EventEmitter {
   sftpWrapper: SFTPWrapper | null = null
   private sshClient: SSHClient | null = null
-  remotePathSep = '/'
+  remotePathSep = posix.sep
   endCalled = false
   errorHandled = false
 
@@ -66,6 +67,10 @@ export class ScpClient extends EventEmitter {
 
     ssh.connect(options)
     this.sshClient = ssh
+
+    if (options.remoteOsType === 'win32') {
+      this.remotePathSep = win32.sep
+    }
   }
 
   public async uploadFile(localPath: string, remotePath: string): Promise<void> {
@@ -345,7 +350,7 @@ export class ScpClient extends EventEmitter {
     }
   }
 
-  public realPath(remotePath: string) {
+  public realPath(remotePath: string): Promise<string> {
     return new Promise((resolve, reject) => {
       const closeListener = utils.makeCloseListener(this, reject, 'realPath')
       this.sshClient!.prependListener('close', closeListener)

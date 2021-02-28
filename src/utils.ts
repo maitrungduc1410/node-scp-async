@@ -662,9 +662,8 @@ export function hasListener(emitter: EventEmitter, eventName: string, listenerNa
 }
 
 export function joinRemote(client: ScpClient, ...args: string[]) {
-  debugger
-  if (client.remotePathSep === '/') {
-    return path.posix.join(...args)
+  if (client.remotePathSep === path.win32.sep) {
+    return path.win32.join(...args)
   }
-  return path.win32.join(...args)
+  return path.posix.join(...args)
 }
