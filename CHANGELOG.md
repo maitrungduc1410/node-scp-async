@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 0.0.15 (2021-07-08)
+
+
+### Features
+
+* add download for remote dir ([e9ea319](https://github.com/maitrungduc1410/node-scp-async/commit/e9ea319cbe09b1202baa684e5077c01bac32d284))
+* add support for readyTimeout and keepalive ([0fc1742](https://github.com/maitrungduc1410/node-scp-async/commit/0fc1742819776cbae6ae6623cdce4b6e2de21cb5))
+
+
+### Bug Fixes
+
+* use export default instead of module exports ([0bfbc8c](https://github.com/maitrungduc1410/node-scp-async/commit/0bfbc8c87088c9184b6c485231ea6fb7a585484e))
+
 # [0.0.7](#) (2020-09-18)
 ### Features
 - Add authentication using `privateKey`
