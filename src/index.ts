@@ -23,7 +23,7 @@ export interface IScpOptions {
 
 export class ScpClient extends EventEmitter {
   sftpWrapper: SFTPWrapper | null = null
-  private sshClient: SSHClient | null = null
+  sshClient: SSHClient | null = null
   remotePathSep = posix.sep
   endCalled = false
   errorHandled = false
