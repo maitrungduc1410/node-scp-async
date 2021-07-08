@@ -394,4 +394,4 @@ export async function Client(options: IScpOptions): Promise<ScpClient> {
   })
 }
 
-module.exports = Client
+export default Client

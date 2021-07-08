@@ -31,14 +31,19 @@
   ],
   "scripts": {
     "watch": "tsc -w",
-    "prepublish": "npm --no-git-tag-version version patch && git add .",
-    "build": "tsc"
+    "build": "tsc",
+    "release": "standard-version"
   },
   "dependencies": {
-    "ssh2": "^0.8.9"
+    "ssh2": "^1.1.0"
   },
   "devDependencies": {
-    "@types/ssh2": "^0.5.44",
-    "typescript": "^4.0.2"
+    "@commitlint/cli": "^12.1.4",
+    "@commitlint/config-conventional": "^12.1.4",
+    "@types/node": "^16.0.1",
+    "@types/ssh2": "^0.5.47",
+    "husky": "^7.0.1",
+    "standard-version": "^9.3.0",
+    "typescript": "^4.3.5"
   }
 }

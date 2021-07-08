@@ -32,9 +32,13 @@ yarn add node-scp
 ## Scp file from local to remote server
 Using `Promise`
 ```js
-const scp = require('node-scp')
+// with commonJS
+const { Client } = require('node-scp')
 
-scp({
+// with ES Module
+import { Client } from 'node-scp'
+
+Client({
   host: 'your host',
   port: 22,
   username: 'username',
@@ -52,11 +56,15 @@ scp({
 
 Using `async/await`:
 ```js
-const scp = require('node-scp')
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
 
 async function test() {
   try {
-    const client = await scp({
+    const client = await Client({
       host: 'your host',
       port: 22,
       username: 'username',
@@ -79,9 +87,13 @@ test()
 ## Scp file from remote server to local
 Using `Promise`
 ```js
-const scp = require('node-scp')
+// with commonJS
+const { Client } = require('node-scp')
 
-scp({
+// with ES Module
+import { Client } from 'node-scp'
+
+Client({
   host: 'your host',
   port: 22,
   username: 'username',
@@ -99,11 +111,15 @@ scp({
 
 Using `async/await`:
 ```js
-const scp = require('node-scp')
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
 
 async function test () {
   try {
-    const client = await scp({
+    const client = await Client({
       host: 'your host',
       port: 22,
       username: 'username',
@@ -124,9 +140,13 @@ test()
 ## Scp a directory from local to remote server
 Using `Promise`
 ```js
-const scp = require('node-scp')
+// with commonJS
+const { Client } = require('node-scp')
 
-scp({
+// with ES Module
+import { Client } from 'node-scp'
+
+Client({
   host: 'your host',
   port: 22,
   username: 'username',
@@ -144,11 +164,15 @@ scp({
 
 Using `async/await`:
 ```js
-const scp = require('node-scp')
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
 
 async funtion test () {
   try {
-    const client = await scp({
+    const client = await Client({
       host: 'your host',
       port: 22,
       username: 'username',
@@ -169,9 +193,13 @@ test()
 ## Scp a directory from remote server to local
 Using `Promise`
 ```js
-const scp = require('node-scp')
+// with commonJS
+const { Client } = require('node-scp')
 
-scp({
+// with ES Module
+import { Client } from 'node-scp'
+
+Client({
   host: 'your host',
   port: 22,
   username: 'username',
@@ -189,11 +217,15 @@ scp({
 
 Using `async/await`:
 ```js
-const scp = require('node-scp')
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
 
 async funtion test () {
   try {
-    const client = await scp({
+    const client = await Client({
       host: 'your host',
       port: 22,
       username: 'username',
@@ -214,9 +246,13 @@ test()
 ## Create a directory on remote server
 Using `Promise`
 ```js
-const scp = require('node-scp')
+// with commonJS
+const { Client } = require('node-scp')
 
-scp({
+// with ES Module
+import { Client } from 'node-scp'
+
+Client({
   host: 'your host',
   port: 22,
   username: 'username',
@@ -234,11 +270,15 @@ scp({
 
 Using `async/await`:
 ```js
-const scp = require('node-scp')
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
 
 async function test() {
   try {
-    const client = await scp({
+    const client = await Client({
       host: 'your host',
       port: 22,
       username: 'username',
@@ -259,9 +299,13 @@ test()
 ## Check if a path exists on remote server
 Using `Promise`
 ```js
-const scp = require('node-scp')
+// with commonJS
+const { Client } = require('node-scp')
 
-scp({
+// with ES Module
+import { Client } from 'node-scp'
+
+Client({
   host: 'your host',
   port: 22,
   username: 'username',
@@ -280,10 +324,14 @@ scp({
 
 Using `async/await`:
 ```js
-const scp = require('node-scp')
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
 async function test() {
   try {
-    const client = await scp({
+    const client = await Client({
       host: 'your host',
       port: 22,
       username: 'username',
@@ -305,9 +353,13 @@ test()
 ## Get stats of a path on remote server
 Using `Promise`
 ```js
-const scp = require('node-scp')
+// with commonJS
+const { Client } = require('node-scp')
 
-scp({
+// with ES Module
+import { Client } from 'node-scp'
+
+Client({
   host: 'your host',
   port: 22,
   username: 'username',
@@ -326,11 +378,15 @@ scp({
 
 Using `async/await`:
 ```js
-const scp = require('node-scp')
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
 
 async function test() {
   try {
-    const client = await scp({
+    const client = await Client({
       host: 'your host',
       port: 22,
       username: 'username',
@@ -352,9 +408,13 @@ test()
 ## List all files in remote directory
 Using `Promise`
 ```js
-const scp = require('node-scp')
+// with commonJS
+const { Client } = require('node-scp')
 
-scp({
+// with ES Module
+import { Client } from 'node-scp'
+
+Client({
   host: 'your host',
   port: 22,
   username: 'username',
@@ -373,11 +433,15 @@ scp({
 
 Using `async/await`:
 ```js
-const scp = require('node-scp')
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
 
 async function test() {
   try {
-    const client = await scp({
+    const client = await Client({
       host: 'your host',
       port: 22,
       username: 'username',
@@ -399,9 +463,13 @@ test()
 ## Convert relative path to absolute path on remote server
 Using `Promise`
 ```js
-const scp = require('node-scp')
+// with commonJS
+const { Client } = require('node-scp')
 
-scp({
+// with ES Module
+import { Client } from 'node-scp'
+
+Client({
   host: 'your host',
   port: 22,
   username: 'username',
@@ -420,11 +488,15 @@ scp({
 
 Using `async/await`:
 ```js
-const scp = require('node-scp')
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
 
 async function test() {
   try {
-    const client = await scp({
+    const client = await Client({
       host: 'your host',
       port: 22,
       username: 'username',
