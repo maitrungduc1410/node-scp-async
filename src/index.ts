@@ -18,7 +18,8 @@ export interface IScpOptions {
   readyTimeout?: number
   keepaliveInterval?: number
   keepaliveCountMax?: number
-  remoteOsType?: 'posix' | 'win32'
+  remoteOsType?: 'posix' | 'win32',
+  sock?: NodeJS.ReadableStream | undefined;
 }
 
 export class ScpClient extends EventEmitter {
