@@ -253,7 +253,7 @@ export async function checkLocalReadFile(localPath: string, localType: string) {
       }
     }
   } catch (err) {
-    throw formatError(err, 'checkLocalReadFile')
+    throw formatError(err as ErrorCustom, 'checkLocalReadFile')
   }
 }
 
@@ -288,7 +288,7 @@ export async function checkLocalReadDir(localPath: string, localType: string) {
       return rslt
     }
   } catch (err) {
-    throw formatError(err, 'checkLocalReadDir')
+    throw formatError(err as ErrorCustom, 'checkLocalReadDir')
   }
 }
 
@@ -328,7 +328,7 @@ export async function checkLocalWriteFile(localPath: string, localType: string) 
       }
     }
   } catch (err) {
-    throw formatError(err, 'checkLocalWriteFile')
+    throw formatError(err as ErrorCustom, 'checkLocalWriteFile')
   }
 }
 
@@ -368,32 +368,28 @@ export async function checkLocalWriteDir(localPath: string, localType: string) {
       }
     }
   } catch (err) {
-    throw formatError(err, 'checkLocalWriteDir')
+    throw formatError(err as ErrorCustom, 'checkLocalWriteDir')
   }
 }
 
 export async function checkLocalPath(lPath: string, target = targetType.readFile) {
-  try {
-    const localPath = path.resolve(lPath)
-    const type = await localExists(localPath)
-    switch (target) {
-      case targetType.readFile:
-        return checkLocalReadFile(localPath, type)
-      case targetType.readDir:
-        return checkLocalReadDir(localPath, type)
-      case targetType.writeFile:
-        return checkLocalWriteFile(localPath, type)
-      case targetType.writeDir:
-        return checkLocalWriteDir(localPath, type)
-      default:
-        return {
-          path: localPath,
-          type,
-          valid: true
-        }
-    }
-  } catch (err) {
-    throw new Error(err)
+  const localPath = path.resolve(lPath)
+  const type = await localExists(localPath)
+  switch (target) {
+    case targetType.readFile:
+      return checkLocalReadFile(localPath, type)
+    case targetType.readDir:
+      return checkLocalReadDir(localPath, type)
+    case targetType.writeFile:
+      return checkLocalWriteFile(localPath, type)
+    case targetType.writeDir:
+      return checkLocalWriteDir(localPath, type)
+    default:
+      return {
+        path: localPath,
+        type,
+        valid: true
+      }
   }
 }
 
@@ -408,7 +404,7 @@ export async function normalizeRemotePath(client: ScpClient, aPath: string) {
     }
     return aPath
   } catch (err) {
-    throw formatError(err, 'normalizeRemotePath')
+    throw formatError(err as ErrorCustom, 'normalizeRemotePath')
   }
 }
 

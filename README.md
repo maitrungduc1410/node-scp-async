@@ -517,18 +517,192 @@ test()
 
 ## Connection options
 Below are available options you can pass when connecting to server:
-- **host**: - *string* - Hostname or IP address of the server. **Default**: `localhost`
-- **port** - *integer* - Port number of the server. **Default**: `22`
-- **forceIPv4** - *boolean* - Only connect via resolved IPv4 address for `host`. **Default**: `false`
-- **forceIPv6** - *boolean* - Only connect via resolved IPv6 address for `host`. **Default**: `false`
-- **username** - *string* - Username for authentication. **Default**: (none)
-- **password** - *string* - Password for password-based user authentication. **Default**: (none)
-- **privateKey** - *mixed* - `Buffer` or `string` that contains a private key for either key-based or hostbased user authentication (OpenSSH format). **Default**: (none)
-- **passphrase** - *string* - For an encrypted private key, this is the passphrase used to decrypt it. **Default**: (none)
-- **readyTimeout** - *integer* - FHow long (in milliseconds) to wait for the SSH handshake to complete. **Default**: `20000`
-- **keepaliveInterval** - *integer* - How often (in milliseconds) to send SSH-level keepalive packets to the server (in a similar way as OpenSSH's ServerAliveInterval config option). Set to 0 to disable. **Default**: `0`
-- **keepaliveCountMax** - *integer* -  How many consecutive, unanswered SSH-level keepalive packets that can be sent to the server before disconnection (similar to OpenSSH's ServerAliveCountMax config option). **Default**: `3`
-- **remoteOsType** - string (value: `posix` | `win32`): use backslash `\` for Windows or slash `/` on posix system (Linux, MacOS) when handling remote server path. **Default**: `posix`
-- **Default authentication method order**: None -> Password -> Private Key
+* **agent** - _string_ - Path to ssh-agent's UNIX socket for ssh-agent-based user authentication. **Windows users: set to 'pageant' for authenticating with Pageant or (actual) path to a cygwin "UNIX socket."** **Default:** (none)
+
+* **agentForward** - _boolean_ - Set to `true` to use OpenSSH agent forwarding (`auth-agent@openssh.com`) for the life of the connection. `agent` must also be set to use this feature. **Default:** `false`
+
+* **algorithms** - _object_ - This option allows you to explicitly override the default transport layer algorithms used for the connection. The value for each category must either be an array of valid algorithm names to set an exact list (with the most preferable first) or an object containing `append`, `prepend`, and/or `remove` properties that each contain an _array_ of algorithm names or RegExps to match to adjust default lists for each category. Valid keys:
+
+    * **cipher** - _mixed_ - Ciphers.
+        * Default list (in order from most to least preferable):
+          * `chacha20-poly1305@openssh.com` (priority of chacha20-poly1305 may vary depending upon CPU and/or optional binding availability)
+          * `aes128-gcm`
+          * `aes128-gcm@openssh.com`
+          * `aes256-gcm`
+          * `aes256-gcm@openssh.com`
+          * `aes128-ctr`
+          * `aes192-ctr`
+          * `aes256-ctr`
+        * Other supported names:
+          * `3des-cbc`
+          * `aes256-cbc`
+          * `aes192-cbc`
+          * `aes128-cbc`
+          * `arcfour256`
+          * `arcfour128`
+          * `arcfour`
+          * `blowfish-cbc`
+          * `cast128-cbc`
+
+    * **compress** - _mixed_ - Compression algorithms.
+        * Default list (in order from most to least preferable):
+          * `none`
+          * `zlib@openssh.com`
+          * `zlib`
+        * Other supported names:
+
+    * **hmac** - _mixed_ - (H)MAC algorithms.
+        * Default list (in order from most to least preferable):
+          * `hmac-sha2-256-etm@openssh.com`
+          * `hmac-sha2-512-etm@openssh.com`
+          * `hmac-sha1-etm@openssh.com`
+          * `hmac-sha2-256`
+          * `hmac-sha2-512`
+          * `hmac-sha1`
+        * Other supported names:
+          * `hmac-md5`
+          * `hmac-sha2-256-96`
+          * `hmac-sha2-512-96`
+          * `hmac-ripemd160`
+          * `hmac-sha1-96`
+          * `hmac-md5-96`
+
+    * **kex** - _mixed_ - Key exchange algorithms.
+        * Default list (in order from most to least preferable):
+          * `curve25519-sha256` (node v14.0.0+)
+          * `curve25519-sha256@libssh.org` (node v14.0.0+)
+          * `ecdh-sha2-nistp256`
+          * `ecdh-sha2-nistp384`
+          * `ecdh-sha2-nistp521`
+          * `diffie-hellman-group-exchange-sha256`
+          * `diffie-hellman-group14-sha256`
+          * `diffie-hellman-group15-sha512`
+          * `diffie-hellman-group16-sha512`
+          * `diffie-hellman-group17-sha512`
+          * `diffie-hellman-group18-sha512`
+        * Other supported names:
+          * `diffie-hellman-group-exchange-sha1`
+          * `diffie-hellman-group14-sha1`
+          * `diffie-hellman-group1-sha1`
+
+    * **serverHostKey** - _mixed_ - Server host key formats.
+        * Default list (in order from most to least preferable):
+          * `ssh-ed25519` (node v12.0.0+)
+          * `ecdsa-sha2-nistp256`
+          * `ecdsa-sha2-nistp384`
+          * `ecdsa-sha2-nistp521`
+          * `rsa-sha2-512`
+          * `rsa-sha2-256`
+          * `ssh-rsa`
+        * Other supported names:
+          * `ssh-dss`
+
+* **authHandler** - _mixed_ - Either an array of objects as described below or a function with parameters `(methodsLeft, partialSuccess, callback)` where `methodsLeft` and `partialSuccess` are `null` on the first authentication attempt, otherwise are an array and boolean respectively. Return or call `callback()` with either the name of the authentication method or an object containing the method name along with method-specific details to try next (return/pass `false` to signal no more methods to try). Valid method names are: `'none', 'password', 'publickey', 'agent', 'keyboard-interactive', 'hostbased'`. **Default:** function that follows a set method order: None -> Password -> Private Key -> Agent (-> keyboard-interactive if `tryKeyboard` is `true`) -> Hostbased
+
+    * When returning or calling `callback()` with an object, it can take one of the following forms:
+
+        ```js
+        {
+          type: 'none',
+          username: 'foo',
+        }
+        ```
+
+        ```js
+        {
+          type: 'password'
+          username: 'foo',
+          password: 'bar',
+        }
+        ```
+
+        ```js
+        {
+          type: 'publickey'
+          username: 'foo',
+          // Can be a string, Buffer, or parsed key containing a private key
+          key: ...,
+          // `passphrase` only required for encrypted keys
+          passphrase: ...,
+        }
+        ```
+
+        ```js
+        {
+          type: 'hostbased'
+          username: 'foo',
+          localHostname: 'baz',
+          localUsername: 'quux',
+          // Can be a string, Buffer, or parsed key containing a private key
+          key: ...,
+          // `passphrase` only required for encrypted keys
+          passphrase: ...,
+        }
+        ```
+
+        ```js
+        {
+          type: 'agent'
+          username: 'foo',
+          // Can be a string that is interpreted exactly like the `agent`
+          // connection config option or can be a custom agent
+          // object/instance that extends and implements `BaseAgent`
+          agent: ...,
+        }
+        ```
+
+        ```js
+        {
+          type: 'keyboard-interactive'
+          username: 'foo',
+          // This works exactly the same way as a 'keyboard-interactive'
+          // Client event handler
+          prompt: (name, instructions, instructionsLang, prompts, finish) => {
+            // ...
+          },
+        }
+        ```
+
+* **debug** - _function_ - Set this to a function that receives a single string argument to get detailed (local) debug information. **Default:** (none)
+
+* **forceIPv4** - _boolean_ - Only connect via resolved IPv4 address for `host`. **Default:** `false`
+
+* **forceIPv6** - _boolean_ - Only connect via resolved IPv6 address for `host`. **Default:** `false`
+
+* **host** - _string_ - Hostname or IP address of the server. **Default:** `'localhost'`
+
+* **hostHash** - _string_ - Any valid hash algorithm supported by node. The host's key is hashed using this algorithm and passed to the **hostVerifier** function as a hex string. **Default:** (none)
+
+* **hostVerifier** - _function_ - Function with parameters `(hashedKey[, callback])` where `hashedKey` is a string hex hash of the host's key for verification purposes. Return `true` to continue with the handshake or `false` to reject and disconnect, or call `callback()` with `true` or `false` if you need to perform asynchronous verification. **Default:** (auto-accept if `hostVerifier` is not set)
+
+* **keepaliveCountMax** - _integer_ - How many consecutive, unanswered SSH-level keepalive packets that can be sent to the server before disconnection (similar to OpenSSH's ServerAliveCountMax config option). **Default:** `3`
+
+* **keepaliveInterval** - _integer_ - How often (in milliseconds) to send SSH-level keepalive packets to the server (in a similar way as OpenSSH's ServerAliveInterval config option). Set to 0 to disable. **Default:** `0`
+
+* **localAddress** - _string_ - IP address of the network interface to use to connect to the server. **Default:** (none -- determined by OS)
+
+* **localHostname** - _string_ - Along with **localUsername** and **privateKey**, set this to a non-empty string for hostbased user authentication. **Default:** (none)
+
+* **localPort** - _string_ - The local port number to connect from. **Default:** (none -- determined by OS)
+
+* **localUsername** - _string_ - Along with **localHostname** and **privateKey**, set this to a non-empty string for hostbased user authentication. **Default:** (none)
+
+* **passphrase** - _string_ - For an encrypted `privateKey`, this is the passphrase used to decrypt it. **Default:** (none)
+
+* **password** - _string_ - Password for password-based user authentication. **Default:** (none)
+
+* **port** - _integer_ - Port number of the server. **Default:** `22`
+
+* **privateKey** - _mixed_ - _Buffer_ or _string_ that contains a private key for either key-based or hostbased user authentication (OpenSSH format). **Default:** (none)
+
+* **readyTimeout** - _integer_ - How long (in milliseconds) to wait for the SSH handshake to complete. **Default:** `20000`
+
+* **sock** - _ReadableStream_ - A _ReadableStream_ to use for communicating with the server instead of creating and using a new TCP connection (useful for connection hopping).
+
+* **strictVendor** - _boolean_ - Performs a strict server vendor check before sending vendor-specific requests, etc. (e.g. check for OpenSSH server when using `openssh_noMoreSessions()`) **Default:** `true`
+
+* **tryKeyboard** - _boolean_ - Try keyboard-interactive user authentication if primary user authentication method fails. If you set this to `true`, you need to handle the `keyboard-interactive` event. **Default:** `false`
+
+* **username** - _string_ - Username for authentication. **Default:** (none)
 # Support
 If you like this project, give me 1 ⭐️

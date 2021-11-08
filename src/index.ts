@@ -1,25 +1,13 @@
 import { EventEmitter } from 'events'
 import { mkdirSync, readdirSync, existsSync } from 'fs'
 import { join, win32, posix } from 'path'
-import { Client as SSHClient, SFTPWrapper } from 'ssh2'
+import { Client as SSHClient, ConnectConfig, SFTPWrapper } from 'ssh2'
 import { Stats } from 'ssh2-streams'
 import { targetType } from './constant'
 import * as utils from './utils'
 
-export interface IScpOptions {
-  host?: string
-  port?: number
-  username?: string
-  password?: string
-  privateKey?: Buffer | string
-  passphrase?: string
-  forceIPv4?: boolean
-  forceIPv6?: boolean
-  readyTimeout?: number
-  keepaliveInterval?: number
-  keepaliveCountMax?: number
+export type TScpOptions = ConnectConfig & {
   remoteOsType?: 'posix' | 'win32',
-  sock?: NodeJS.ReadableStream | undefined;
 }
 
 export class ScpClient extends EventEmitter {
@@ -29,7 +17,7 @@ export class ScpClient extends EventEmitter {
   endCalled = false
   errorHandled = false
 
-  constructor(options: IScpOptions) {
+  constructor(options: TScpOptions) {
     super()
 
     const ssh = new SSHClient()
@@ -151,48 +139,44 @@ export class ScpClient extends EventEmitter {
 
   public async downloadDir(remotePath: string, localPath: string) {
     utils.haveConnection(this, 'downloadDir')
-    try {
-      const remoteInfo: any = await utils.checkRemotePath(
-        this,
-        remotePath,
-        targetType.readDir
-      )
-      if (!remoteInfo.valid) {
-        throw new Error(remoteInfo.msg)
-      }
-
-      if (!existsSync(localPath)) {
-        mkdirSync(localPath)
-      }
-
-      const localInfo = await utils.checkLocalPath(localPath, targetType.writeDir)
-
-      if (localInfo.valid && !localInfo.type) {
-        mkdirSync(localInfo.path, { recursive: true })
-      }
-
-      if (!localInfo.valid) {
-        throw new Error(localInfo.msg)
-      }
-      const fileList = await this.list(remoteInfo.path)
-      for (const f of fileList) {
-        if (f.type === 'd') {
-          const newSrc = remoteInfo.path + this.remotePathSep + f.name
-          const newDst = join(localInfo.path, f.name)
-          await this.downloadDir(newSrc, newDst)
-        } else if (f.type === '-') {
-          const src = remoteInfo.path + this.remotePathSep + f.name
-          const dst = join(localInfo.path, f.name)
-          await this.downloadFile(src, dst)
-          this.sshClient!.emit('download', { source: src, destination: dst })
-        } else {
-          console.log(`downloadDir: File ignored: ${f.name} not regular file`)
-        }
-      }
-      return `${remoteInfo.path} downloaded to ${localInfo.path}`
-    } catch (err) {
-      throw new Error(err)
+    const remoteInfo: any = await utils.checkRemotePath(
+      this,
+      remotePath,
+      targetType.readDir
+    )
+    if (!remoteInfo.valid) {
+      throw new Error(remoteInfo.msg)
     }
+
+    if (!existsSync(localPath)) {
+      mkdirSync(localPath)
+    }
+
+    const localInfo = await utils.checkLocalPath(localPath, targetType.writeDir)
+
+    if (localInfo.valid && !localInfo.type) {
+      mkdirSync(localInfo.path, { recursive: true })
+    }
+
+    if (!localInfo.valid) {
+      throw new Error(localInfo.msg)
+    }
+    const fileList = await this.list(remoteInfo.path)
+    for (const f of fileList) {
+      if (f.type === 'd') {
+        const newSrc = remoteInfo.path + this.remotePathSep + f.name
+        const newDst = join(localInfo.path, f.name)
+        await this.downloadDir(newSrc, newDst)
+      } else if (f.type === '-') {
+        const src = remoteInfo.path + this.remotePathSep + f.name
+        const dst = join(localInfo.path, f.name)
+        await this.downloadFile(src, dst)
+        this.sshClient!.emit('download', { source: src, destination: dst })
+      } else {
+        console.log(`downloadDir: File ignored: ${f.name} not regular file`)
+      }
+    }
+    return `${remoteInfo.path} downloaded to ${localInfo.path}`
   }
 
   public async stat(remotePath: string): Promise<Stats> {
@@ -335,20 +319,16 @@ export class ScpClient extends EventEmitter {
       })
     }
 
-    try {
-      utils.haveConnection(this, 'list')
-      const pathInfo = await utils.checkRemotePath(
-        this,
-        remotePath,
-        targetType.readDir
-      )
-      if (!pathInfo.valid) {
-        throw new Error('Remote path is invalid')
-      }
-      return _list(pathInfo.path, pattern)
-    } catch (err) {
-      throw new Error(err)
+    utils.haveConnection(this, 'list')
+    const pathInfo = await utils.checkRemotePath(
+      this,
+      remotePath,
+      targetType.readDir
+    )
+    if (!pathInfo.valid) {
+      throw new Error('Remote path is invalid')
     }
+    return _list(pathInfo.path, pattern)
   }
 
   public realPath(remotePath: string): Promise<string> {
@@ -381,7 +361,7 @@ export class ScpClient extends EventEmitter {
   }
 }
 
-export async function Client(options: IScpOptions): Promise<ScpClient> {
+export async function Client(options: TScpOptions): Promise<ScpClient> {
   const client = new ScpClient(options)
 
   return new Promise((resolve, reject) => {
