@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.16](https://github.com/maitrungduc1410/node-scp-async/compare/v0.0.15...v0.0.16) (2021-11-08)
+
+
+### Features
+
+* allow passing all options from ssh2 ([758607e](https://github.com/maitrungduc1410/node-scp-async/commit/758607e7159ab802d2c0c467796857dc85250ad9))
+
 ### 0.0.15 (2021-07-08)
 
 
