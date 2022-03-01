@@ -5,6 +5,7 @@ import { Client as SSHClient, ConnectConfig, SFTPWrapper } from 'ssh2'
 import { Stats } from 'ssh2-streams'
 import { targetType } from './constant'
 import * as utils from './utils'
+import { TransferOptions, InputAttributes } from 'ssh2-streams'
 
 export type TScpOptions = ConnectConfig & {
   remoteOsType?: 'posix' | 'win32',
@@ -62,10 +63,10 @@ export class ScpClient extends EventEmitter {
     }
   }
 
-  public async uploadFile(localPath: string, remotePath: string): Promise<void> {
+  public async uploadFile(localPath: string, remotePath: string, options: TransferOptions = {}): Promise<void> {
     utils.haveConnection(this, 'uploadFile')
     return new Promise((resolve, reject) => {
-      this.sftpWrapper!.fastPut(localPath, remotePath, (err) => {
+      this.sftpWrapper!.fastPut(localPath, remotePath, options, (err) => {
         if (err) {
           reject(err)
         } else {
@@ -75,10 +76,10 @@ export class ScpClient extends EventEmitter {
     })
   }
 
-  public async downloadFile(remotePath: string, localPath: string): Promise<void> {
+  public async downloadFile(remotePath: string, localPath: string, options: TransferOptions = {}): Promise<void> {
     utils.haveConnection(this, 'downloadFile')
     return new Promise((resolve, reject) => {
-      this.sftpWrapper!.fastGet(remotePath, localPath, (err) => {
+      this.sftpWrapper!.fastGet(remotePath, localPath, options, (err) => {
         if (err) {
           reject(err)
         } else {
@@ -231,10 +232,10 @@ export class ScpClient extends EventEmitter {
     await this._rmdir(remotePath)
   }
 
-  public async mkdir(remotePath: string): Promise<void> {
+  public async mkdir(remotePath: string, attributes: InputAttributes = {}): Promise<void> {
     utils.haveConnection(this, 'mkdir')
     return new Promise((resolve, reject) => {
-      this.sftpWrapper!.mkdir(remotePath, (err) => {
+      this.sftpWrapper!.mkdir(remotePath, attributes, (err) => {
         if (err) {
           reject(err)
         } else {

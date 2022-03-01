@@ -5,3 +5,5 @@ tsconfig.json
 tslint.json
 test.js
 .github
+.husky
+commitlint.config.js

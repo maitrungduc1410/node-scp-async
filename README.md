@@ -46,7 +46,11 @@ Client({
   // privateKey: fs.readFileSync('./key.pem'),
   // passphrase: 'your key passphrase',
 }).then(client => {
-  client.uploadFile('./test.txt', '/workspace/test.txt')
+  client.uploadFile(
+    './test.txt',
+    '/workspace/test.txt',
+    // options?: TransferOptions
+  )
         .then(response => {
           client.close() // remember to close connection after you finish
         })
@@ -72,7 +76,11 @@ async function test() {
       // privateKey: fs.readFileSync('./key.pem'),
       // passphrase: 'your key passphrase',
     })
-    await client.uploadFile('./test.txt', '/workspace/test.txt')
+    await client.uploadFile(
+      './test.txt',
+      '/workspace/test.txt',
+      // options?: TransferOptions
+    )
     // you can perform upload multiple times
     await client.uploadFile('./test1.txt', '/workspace/test1.txt')
     client.close() // remember to close connection after you finish
@@ -101,7 +109,11 @@ Client({
   // privateKey: fs.readFileSync('./key.pem'),
   // passphrase: 'your key passphrase',
 }).then(client => {
-  client.downloadFile('/workspace/test.txt', './test.txt')
+  client.downloadFile(
+    '/workspace/test.txt',
+    './test.txt',
+    // options?: TransferOptions
+  )
         .then(response => {
           client.close() // remember to close connection after you finish
         })
@@ -127,7 +139,11 @@ async function test () {
       // privateKey: fs.readFileSync('./key.pem'),
       // passphrase: 'your key passphrase',
     })
-    await client.downloadFile('/workspace/test.txt', './test.txt')
+    await client.downloadFile(
+      '/workspace/test.txt',
+      './test.txt',
+      // options?: TransferOptions
+    )
     client.close() // remember to close connection after you finish
   } catch(e) {
     console.log(e)
@@ -260,7 +276,10 @@ Client({
   // privateKey: fs.readFileSync('./key.pem'),
   // passphrase: 'your key passphrase',
 }).then(client => {
-  client.mkdir('/server/path')
+  client.mkdir(
+    '/server/path',
+    // attributes?: InputAttributes
+  )
         .then(response => {
           client.close() // remember to close connection after you finish
         })
@@ -286,7 +305,10 @@ async function test() {
       // privateKey: fs.readFileSync('./key.pem'),
       // passphrase: 'your key passphrase',
     })
-    await client.mkdir('/server/path')
+    await client.mkdir(
+      '/server/path',
+      // attributes: InputAttributes
+    )
     client.close() // remember to close connection after you finish
   } catch (e) {
     console.log(e)
