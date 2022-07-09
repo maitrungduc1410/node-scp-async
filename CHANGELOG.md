@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.18](https://github.com/maitrungduc1410/node-scp-async/compare/v0.0.16...v0.0.18) (2022-07-09)
+
+
+### Features
+
+* add support for passing options to uploadFile, downloadFile and mkdir ([3769ece](https://github.com/maitrungduc1410/node-scp-async/commit/3769ece84dcdb8830e9b18e3ec84a0fa4e10e903))
+
 ### [0.0.17](https://github.com/maitrungduc1410/node-scp-async/compare/v0.0.16...v0.0.17) (2021-11-08)
 
 
