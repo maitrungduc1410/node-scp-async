@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.21](https://github.com/maitrungduc1410/node-scp-async/compare/v0.0.20...v0.0.21) (2022-09-20)
+
+
+### Features
+
+* add more operations ([0aaade9](https://github.com/maitrungduc1410/node-scp-async/commit/0aaade9530b569b29df957782ddd296953c8af64))
+
 ### [0.0.20](https://github.com/maitrungduc1410/node-scp-async/compare/v0.0.18...v0.0.20) (2022-09-20)
 
 ### [0.0.18](https://github.com/maitrungduc1410/node-scp-async/compare/v0.0.16...v0.0.18) (2022-07-09)
