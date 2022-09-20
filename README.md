@@ -18,8 +18,22 @@ And other new features:
   * [Create a directory on remote server](#Create-a-directory-on-remote-server)
   * [Check if a path exists on remote server](#Check-if-a-path-exists-on-remote-server)
   * [Get stats of a path on remote server](#Get-stats-of-a-path-on-remote-server)
+  * [Sets the attributes defined in attributes for path](#sets-the-attributes-defined-in-attributes-for-path)
   * [List all files in remote directory](#List-all-files-in-remote-directory)
   * [Convert relative path to absolute path on remote server](#Convert-relative-path-to-absolute-path-on-remote-server)
+  * [Remove file in remote server](#remove-file-in-remote-server)
+  * [Remove a directory in remote server](#remove-a-directory-in-remote-server)
+  * [Clean a directory in remote server](#clean-a-directory-in-remote-server)
+  * [Write data to a file in remote server](#write-data-to-a-file-in-remote-server)
+  * [Set the access time and modified time for path](#sets-the-access-time-and-modified-time-for-path)
+  * [Create a symlink](#creates-a-symlink-at-linkpath-to-targetpath)
+  * [Rename/Move a source to destination](#renamesmoves-srcpath-to-destpath)
+  * [Retrieve the target for a symlink](#retrieves-the-target-for-a-symlink-at-path)
+  * [Read a file in memory and returns its contents](#reads-a-file-in-memory-and-returns-its-contents)
+  * [Retrieve attributes for path](#retrieves-attributes-for-path)
+  * [Append data to a file](#appends-data-to-a-file)
+  * [Set the mode for a path](#sets-the-mode-for-path)
+  * [Set the owner for a path](#sets-the-owner-for-path)
   * [Connection options](#Connection-options)
 
 # Installation
@@ -249,7 +263,7 @@ async funtion test () {
       // privateKey: fs.readFileSync('./key.pem'),
       // passphrase: 'your key passphrase',
     })
-    await client.downloadDir('./local/dir', '/server/path')
+    await client.downloadDir('/server/path', './local/dir')
     client.close() // remember to close connection after you finish
   } catch (e) {
     console.log(e)
@@ -416,8 +430,61 @@ async function test() {
       // privateKey: fs.readFileSync('./key.pem'),
       // passphrase: 'your key passphrase',
     })
-    cosnt result = await client.stat('/server/path')
+    const result = await client.stat('/server/path')
     console.log(result)
+    client.close() // remember to close connection after you finish
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+test()
+```
+
+## Sets the attributes defined in `attributes` for `path`
+Using `Promise`
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+Client({
+  host: 'your host',
+  port: 22,
+  username: 'username',
+  password: 'password',
+  // privateKey: fs.readFileSync('./key.pem'),
+  // passphrase: 'your key passphrase',
+}).then(client => {
+  client.setstat('/server/path', {/* InputAttributes */})
+        .then(() => {
+          client.close() // remember to close connection after you finish
+        })
+        .catch(error => {})
+}).catch(e => console.log(e))
+```
+
+Using `async/await`:
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+async function test() {
+  try {
+    const client = await Client({
+      host: 'your host',
+      port: 22,
+      username: 'username',
+      password: 'password',
+      // privateKey: fs.readFileSync('./key.pem'),
+      // passphrase: 'your key passphrase',
+    })
+    await client.setstat('/server/path', {/* InputAttributes */})
     client.close() // remember to close connection after you finish
   } catch (e) {
     console.log(e)
@@ -471,7 +538,7 @@ async function test() {
       // privateKey: fs.readFileSync('./key.pem'),
       // passphrase: 'your key passphrase',
     })
-    cosnt result = await client.list('/server/path')
+    const result = await client.list('/server/path')
     console.log(result)
     client.close() // remember to close connection after you finish
   } catch (e) {
@@ -526,8 +593,700 @@ async function test() {
       // privateKey: fs.readFileSync('./key.pem'),
       // passphrase: 'your key passphrase',
     })
-    cosnt result = await client.realPath('/server/path')
+    const result = await client.realPath('/server/path')
     console.log(result)
+    client.close() // remember to close connection after you finish
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+test()
+```
+## Remove file in remote server
+Using `Promise`
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+Client({
+  host: 'your host',
+  port: 22,
+  username: 'username',
+  password: 'password',
+  // privateKey: fs.readFileSync('./key.pem'),
+  // passphrase: 'your key passphrase',
+}).then(client => {
+  client.unlink('/server/path/myfile.txt')
+        .then(() => {
+          client.close() // remember to close connection after you finish
+        })
+        .catch(error => {})
+}).catch(e => console.log(e))
+```
+
+Using `async/await`:
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+async function test() {
+  try {
+    const client = await Client({
+      host: 'your host',
+      port: 22,
+      username: 'username',
+      password: 'password',
+      // privateKey: fs.readFileSync('./key.pem'),
+      // passphrase: 'your key passphrase',
+    })
+    await client.unlink('/server/path/myfile.txt')
+    client.close() // remember to close connection after you finish
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+test()
+```
+## Remove a directory in remote server
+Using `Promise`
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+Client({
+  host: 'your host',
+  port: 22,
+  username: 'username',
+  password: 'password',
+  // privateKey: fs.readFileSync('./key.pem'),
+  // passphrase: 'your key passphrase',
+}).then(client => {
+  client.rmdir('/server/path')
+        .then(() => {
+          client.close() // remember to close connection after you finish
+        })
+        .catch(error => {})
+}).catch(e => console.log(e))
+```
+
+Using `async/await`:
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+async function test() {
+  try {
+    const client = await Client({
+      host: 'your host',
+      port: 22,
+      username: 'username',
+      password: 'password',
+      // privateKey: fs.readFileSync('./key.pem'),
+      // passphrase: 'your key passphrase',
+    })
+    await client.rmdir('/server/path')
+    client.close() // remember to close connection after you finish
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+test()
+```
+## Clean a directory in remote server
+Using `Promise`
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+Client({
+  host: 'your host',
+  port: 22,
+  username: 'username',
+  password: 'password',
+  // privateKey: fs.readFileSync('./key.pem'),
+  // passphrase: 'your key passphrase',
+}).then(client => {
+  client.emptyDir('/server/path')
+        .then(() => {
+          client.close() // remember to close connection after you finish
+        })
+        .catch(error => {})
+}).catch(e => console.log(e))
+```
+
+Using `async/await`:
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+async function test() {
+  try {
+    const client = await Client({
+      host: 'your host',
+      port: 22,
+      username: 'username',
+      password: 'password',
+      // privateKey: fs.readFileSync('./key.pem'),
+      // passphrase: 'your key passphrase',
+    })
+    await client.emptyDir('/server/path')
+    client.close() // remember to close connection after you finish
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+test()
+```
+
+## Write data to a file in remote server
+Using `Promise`
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+Client({
+  host: 'your host',
+  port: 22,
+  username: 'username',
+  password: 'password',
+  // privateKey: fs.readFileSync('./key.pem'),
+  // passphrase: 'your key passphrase',
+}).then(client => {
+  client.writeFile('/server/path/test.txt', 'some data', { /* WriteFileOptions */ })
+        .then(() => {
+          client.close() // remember to close connection after you finish
+        })
+        .catch(error => {})
+}).catch(e => console.log(e))
+```
+
+Using `async/await`:
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+async function test() {
+  try {
+    const client = await Client({
+      host: 'your host',
+      port: 22,
+      username: 'username',
+      password: 'password',
+      // privateKey: fs.readFileSync('./key.pem'),
+      // passphrase: 'your key passphrase',
+    })
+    await client.writeFile('/server/path/test.txt', 'some data', { /* WriteFileOptions */ })
+    client.close() // remember to close connection after you finish
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+test()
+```
+
+## Sets the access time and modified time for `path`
+Using `Promise`
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+Client({
+  host: 'your host',
+  port: 22,
+  username: 'username',
+  password: 'password',
+  // privateKey: fs.readFileSync('./key.pem'),
+  // passphrase: 'your key passphrase',
+}).then(client => {
+  client.utimes('/server/path/test.txt', 1663641640819, 1663641640819)
+        .then(() => {
+          client.close() // remember to close connection after you finish
+        })
+        .catch(error => {})
+}).catch(e => console.log(e))
+```
+
+Using `async/await`:
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+async function test() {
+  try {
+    const client = await Client({
+      host: 'your host',
+      port: 22,
+      username: 'username',
+      password: 'password',
+      // privateKey: fs.readFileSync('./key.pem'),
+      // passphrase: 'your key passphrase',
+    })
+    await client.utimes('/server/path/test.txt', 1663641640819, 1663641640819)
+    client.close() // remember to close connection after you finish
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+test()
+```
+
+## Creates a symlink at `linkPath` to `targetPath`
+Using `Promise`
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+Client({
+  host: 'your host',
+  port: 22,
+  username: 'username',
+  password: 'password',
+  // privateKey: fs.readFileSync('./key.pem'),
+  // passphrase: 'your key passphrase',
+}).then(client => {
+  client.symlink('/server/path1/test.txt', '/server/path2/test.txt')
+        .then(() => {
+          client.close() // remember to close connection after you finish
+        })
+        .catch(error => {})
+}).catch(e => console.log(e))
+```
+
+Using `async/await`:
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+async function test() {
+  try {
+    const client = await Client({
+      host: 'your host',
+      port: 22,
+      username: 'username',
+      password: 'password',
+      // privateKey: fs.readFileSync('./key.pem'),
+      // passphrase: 'your key passphrase',
+    })
+    await client.symlink('/server/path1/test.txt', '/server/path2/test.txt')
+    client.close() // remember to close connection after you finish
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+test()
+```
+
+## Renames/moves `srcPath` to `destPath`
+Using `Promise`
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+Client({
+  host: 'your host',
+  port: 22,
+  username: 'username',
+  password: 'password',
+  // privateKey: fs.readFileSync('./key.pem'),
+  // passphrase: 'your key passphrase',
+}).then(client => {
+  client.rename('/server/path1/test.txt', '/server/path2/test.txt')
+        .then(() => {
+          client.close() // remember to close connection after you finish
+        })
+        .catch(error => {})
+}).catch(e => console.log(e))
+```
+
+Using `async/await`:
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+async function test() {
+  try {
+    const client = await Client({
+      host: 'your host',
+      port: 22,
+      username: 'username',
+      password: 'password',
+      // privateKey: fs.readFileSync('./key.pem'),
+      // passphrase: 'your key passphrase',
+    })
+    await client.rename('/server/path1/test.txt', '/server/path2/test.txt')
+    client.close() // remember to close connection after you finish
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+test()
+```
+
+## Retrieves the target for a symlink at `path`
+Using `Promise`
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+Client({
+  host: 'your host',
+  port: 22,
+  username: 'username',
+  password: 'password',
+  // privateKey: fs.readFileSync('./key.pem'),
+  // passphrase: 'your key passphrase',
+}).then(client => {
+  client.readlink('/server/path1/test.txt')
+        .then((result) => {
+          console.log(result)
+          client.close() // remember to close connection after you finish
+        })
+        .catch(error => {})
+}).catch(e => console.log(e))
+```
+
+Using `async/await`:
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+async function test() {
+  try {
+    const client = await Client({
+      host: 'your host',
+      port: 22,
+      username: 'username',
+      password: 'password',
+      // privateKey: fs.readFileSync('./key.pem'),
+      // passphrase: 'your key passphrase',
+    })
+    const result = await client.readlink('/server/path1/test.txt')
+    console.log(result)
+    client.close() // remember to close connection after you finish
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+test()
+```
+
+## Reads a file in memory and returns its contents
+Using `Promise`
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+Client({
+  host: 'your host',
+  port: 22,
+  username: 'username',
+  password: 'password',
+  // privateKey: fs.readFileSync('./key.pem'),
+  // passphrase: 'your key passphrase',
+}).then(client => {
+  client.readFile('/server/path1/test.txt')
+        .then((result) => {
+          console.log(result)
+          client.close() // remember to close connection after you finish
+        })
+        .catch(error => {})
+}).catch(e => console.log(e))
+```
+
+Using `async/await`:
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+async function test() {
+  try {
+    const client = await Client({
+      host: 'your host',
+      port: 22,
+      username: 'username',
+      password: 'password',
+      // privateKey: fs.readFileSync('./key.pem'),
+      // passphrase: 'your key passphrase',
+    })
+    const result = await client.readFile('/server/path1/test.txt')
+    console.log(result)
+    client.close() // remember to close connection after you finish
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+test()
+```
+
+## Retrieves attributes for `path`
+Using `Promise`
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+Client({
+  host: 'your host',
+  port: 22,
+  username: 'username',
+  password: 'password',
+  // privateKey: fs.readFileSync('./key.pem'),
+  // passphrase: 'your key passphrase',
+}).then(client => {
+  client.lstat('/server/path1/test.txt')
+        .then((result) => {
+          console.log(result)
+          client.close() // remember to close connection after you finish
+        })
+        .catch(error => {})
+}).catch(e => console.log(e))
+```
+
+Using `async/await`:
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+async function test() {
+  try {
+    const client = await Client({
+      host: 'your host',
+      port: 22,
+      username: 'username',
+      password: 'password',
+      // privateKey: fs.readFileSync('./key.pem'),
+      // passphrase: 'your key passphrase',
+    })
+    const result = await client.lstat('/server/path1/test.txt')
+    console.log(result)
+    client.close() // remember to close connection after you finish
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+test()
+```
+
+## Appends data to a file
+Using `Promise`
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+Client({
+  host: 'your host',
+  port: 22,
+  username: 'username',
+  password: 'password',
+  // privateKey: fs.readFileSync('./key.pem'),
+  // passphrase: 'your key passphrase',
+}).then(client => {
+  client.appendFile('/server/path1/test.txt', 'some data', {/* WriteFileOptions */})
+        .then(() => {
+          client.close() // remember to close connection after you finish
+        })
+        .catch(error => {})
+}).catch(e => console.log(e))
+```
+
+Using `async/await`:
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+async function test() {
+  try {
+    const client = await Client({
+      host: 'your host',
+      port: 22,
+      username: 'username',
+      password: 'password',
+      // privateKey: fs.readFileSync('./key.pem'),
+      // passphrase: 'your key passphrase',
+    })
+    await client.appendFile('/server/path1/test.txt', 'some data', {/* WriteFileOptions */})
+    client.close() // remember to close connection after you finish
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+test()
+```
+
+## Sets the mode for `path`
+Using `Promise`
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+Client({
+  host: 'your host',
+  port: 22,
+  username: 'username',
+  password: 'password',
+  // privateKey: fs.readFileSync('./key.pem'),
+  // passphrase: 'your key passphrase',
+}).then(client => {
+  client.chmod('/server/path1/test.txt', '+x')
+        .then(() => {
+          client.close() // remember to close connection after you finish
+        })
+        .catch(error => {})
+}).catch(e => console.log(e))
+```
+
+Using `async/await`:
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+async function test() {
+  try {
+    const client = await Client({
+      host: 'your host',
+      port: 22,
+      username: 'username',
+      password: 'password',
+      // privateKey: fs.readFileSync('./key.pem'),
+      // passphrase: 'your key passphrase',
+    })
+    await client.chmod('/server/path1/test.txt', '+x')
+    client.close() // remember to close connection after you finish
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+test()
+```
+
+## Sets the owner for `path`
+Using `Promise`
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+Client({
+  host: 'your host',
+  port: 22,
+  username: 'username',
+  password: 'password',
+  // privateKey: fs.readFileSync('./key.pem'),
+  // passphrase: 'your key passphrase',
+}).then(client => {
+  client.chown('/server/path1/test.txt', 1000, 1000)
+        .then(() => {
+          client.close() // remember to close connection after you finish
+        })
+        .catch(error => {})
+}).catch(e => console.log(e))
+```
+
+Using `async/await`:
+```js
+// with commonJS
+const { Client } = require('node-scp')
+
+// with ES Module
+import { Client } from 'node-scp'
+
+async function test() {
+  try {
+    const client = await Client({
+      host: 'your host',
+      port: 22,
+      username: 'username',
+      password: 'password',
+      // privateKey: fs.readFileSync('./key.pem'),
+      // passphrase: 'your key passphrase',
+    })
+    await client.chown('/server/path1/test.txt', 1000, 1000)
     client.close() // remember to close connection after you finish
   } catch (e) {
     console.log(e)

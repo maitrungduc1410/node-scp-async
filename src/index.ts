@@ -1,11 +1,9 @@
 import { EventEmitter } from 'events'
 import { mkdirSync, readdirSync, existsSync } from 'fs'
 import { join, win32, posix } from 'path'
-import { Client as SSHClient, ConnectConfig, SFTPWrapper } from 'ssh2'
-import { Stats } from 'ssh2-streams'
+import { Client as SSHClient, ConnectConfig, InputAttributes, SFTPWrapper, Stats, TransferOptions, WriteFileOptions } from 'ssh2'
 import { targetType } from './constant'
 import * as utils from './utils'
-import { TransferOptions, InputAttributes } from 'ssh2-streams'
 
 export type TScpOptions = ConnectConfig & {
   remoteOsType?: 'posix' | 'win32',
@@ -48,8 +46,8 @@ export class ScpClient extends EventEmitter {
     ssh.on('keyboard-interactive', (name, instructions, instructionsLang, prompts, finish) => {
       this.emit('keyboard-interactive', name, instructions, instructionsLang, prompts, finish)
     })
-    ssh.on('change password', (message, language, done) => {
-      this.emit('change password', message, language, done)
+    ssh.on('change password', (message, done) => {
+      this.emit('change password', message, done)
     })
     ssh.on('tcp connection', (details, accept, reject) => {
       this.emit('tcp connection', details, accept, reject)
@@ -63,6 +61,9 @@ export class ScpClient extends EventEmitter {
     }
   }
 
+  /**
+   * Uploads a file from `localPath` to `remotePath` using parallel reads for faster throughput.
+   */
   public async uploadFile(localPath: string, remotePath: string, options: TransferOptions = {}): Promise<void> {
     utils.haveConnection(this, 'uploadFile')
     return new Promise((resolve, reject) => {
@@ -76,6 +77,9 @@ export class ScpClient extends EventEmitter {
     })
   }
 
+  /**
+   * Downloads a file at `remotePath` to `localPath` using parallel reads for faster throughput.
+   */
   public async downloadFile(remotePath: string, localPath: string, options: TransferOptions = {}): Promise<void> {
     utils.haveConnection(this, 'downloadFile')
     return new Promise((resolve, reject) => {
@@ -89,6 +93,9 @@ export class ScpClient extends EventEmitter {
     })
   }
 
+  /**
+   * Clean a directory in remote server
+   */
   public async emptyDir(dir: string): Promise<void> {
     utils.haveConnection(this, 'uploadDir')
     try {
@@ -180,6 +187,9 @@ export class ScpClient extends EventEmitter {
     return `${remoteInfo.path} downloaded to ${localInfo.path}`
   }
 
+  /**
+   * Retrieves attributes for `path`.
+   */
   public async stat(remotePath: string): Promise<Stats> {
     utils.haveConnection(this, 'stat')
     return new Promise((resolve, reject) => {
@@ -193,6 +203,25 @@ export class ScpClient extends EventEmitter {
     })
   }
 
+  /**
+   * Sets the attributes defined in `attributes` for `path`.
+   */
+  public async setstat(path: string, attributes: InputAttributes = {}): Promise<void> {
+    utils.haveConnection(this, 'setstat')
+    return new Promise((resolve, reject) => {
+      this.sftpWrapper!.setstat(path, attributes, (err) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve()
+        }
+      })
+    })
+  }
+
+  /**
+   * Removes the file/symlink at `path`.
+   */
   public async unlink(remotePath: string): Promise<void> {
     utils.haveConnection(this, 'unlink')
     return new Promise((resolve, reject) => {
@@ -232,6 +261,9 @@ export class ScpClient extends EventEmitter {
     await this._rmdir(remotePath)
   }
 
+  /**
+   * Creates a new directory `path`.
+   */
   public async mkdir(remotePath: string, attributes: InputAttributes = {}): Promise<void> {
     utils.haveConnection(this, 'mkdir')
     return new Promise((resolve, reject) => {
@@ -265,9 +297,177 @@ export class ScpClient extends EventEmitter {
     }
   }
 
+  /**
+   * Writes data to a file
+   */
+  public async writeFile(remotePath: string, data: string | Buffer, options: WriteFileOptions = {}): Promise<void> {
+    utils.haveConnection(this, 'writeFile')
+    return new Promise((resolve, reject) => {
+      this.sftpWrapper!.writeFile(remotePath, data, options, (err) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve()
+        }
+      })
+    })
+  }
+
+  /**
+   * Sets the access time and modified time for `path`.
+   */
+  public async utimes(path: string, atime: number | Date, mtime: number | Date): Promise<void> {
+    utils.haveConnection(this, 'utimes')
+    return new Promise((resolve, reject) => {
+      this.sftpWrapper!.utimes(path, atime, mtime, (err) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve()
+        }
+      })
+    })
+  }
+
+  /**
+   * Creates a symlink at `linkPath` to `targetPath`.
+   */
+  public async symlink(targetPath: string, linkPath: string): Promise<void> {
+    utils.haveConnection(this, 'symlink')
+    return new Promise((resolve, reject) => {
+      this.sftpWrapper!.symlink(targetPath, linkPath, (err) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve()
+        }
+      })
+    })
+  }
+
+  /**
+   * Renames/moves `srcPath` to `destPath`.
+   */
+  public async rename(srcPath: string, destPath: string): Promise<void> {
+    utils.haveConnection(this, 'rename')
+    return new Promise((resolve, reject) => {
+      this.sftpWrapper!.rename(srcPath, destPath, (err) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve()
+        }
+      })
+    })
+  }
+
+  /**
+   * Retrieves the target for a symlink at `path`.
+   */
+  public async readlink(path: string): Promise<string> {
+    utils.haveConnection(this, 'readlink')
+    return new Promise((resolve, reject) => {
+      this.sftpWrapper!.readlink(path, (err, target) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(target)
+        }
+      })
+    })
+  }
+
+  /**
+   * Reads a file in memory and returns its contents
+   */
+  public async readFile(remotePath: string): Promise<Buffer> {
+    utils.haveConnection(this, 'readFile')
+    return new Promise((resolve, reject) => {
+      this.sftpWrapper!.readFile(remotePath, (err, handle) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(handle)
+        }
+      })
+    })
+  }
+
+  /**
+   * Retrieves attributes for `path`. If `path` is a symlink, the link itself is stat'ed
+   * instead of the resource it refers to.
+   */
+  public async lstat(path: string): Promise<Stats> {
+    utils.haveConnection(this, 'lstat')
+    return new Promise((resolve, reject) => {
+      this.sftpWrapper!.lstat(path, (err, stats) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(stats)
+        }
+      })
+    })
+  }
+
+  /**
+   * Appends data to a file
+   */
+  public async appendFile(remotePath: string, data: string | Buffer, options: WriteFileOptions): Promise<void> {
+    utils.haveConnection(this, 'appendFile')
+    return new Promise((resolve, reject) => {
+      this.sftpWrapper!.appendFile(remotePath, data, options, (err) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve()
+        }
+      })
+    })
+  }
+
+  /**
+   * Sets the mode for `path`.
+   */
+  public async chmod(path: string, mode: number | string): Promise<void> {
+    utils.haveConnection(this, 'chmod')
+    return new Promise((resolve, reject) => {
+      this.sftpWrapper!.chmod(path, mode, (err) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve()
+        }
+      })
+    })
+  }
+
+  /**
+   * Sets the owner for `path`.
+   */
+  public async chown(path: string, uid: number, gid: number): Promise<void> {
+    utils.haveConnection(this, 'chown')
+    return new Promise((resolve, reject) => {
+      this.sftpWrapper!.chown(path, uid, gid, (err) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve()
+        }
+      })
+    })
+  }
+
+  /**
+   * Close SSH connection
+   */
   public close() {
     if (this.sftpWrapper) {
-      this.sftpWrapper.end()
+      this.sftpWrapper.close(Buffer.alloc(1), (err => {
+        if (err) {
+          console.log('Error during closing sftpWrapper', err)
+        }
+      }))
       this.sftpWrapper = null
     }
     if (this.sshClient) {
@@ -278,6 +478,9 @@ export class ScpClient extends EventEmitter {
     this.endCalled = true
   }
 
+  /**
+   * List all files and directories at remotePath
+   */
   public async list(remotePath: string, pattern = /.*/): Promise<any> {
     const _list = (aPath: string, filter: RegExp | string) => {
       return new Promise((resolve, reject) => {
@@ -332,6 +535,9 @@ export class ScpClient extends EventEmitter {
     return _list(pathInfo.path, pattern)
   }
 
+  /**
+   * Resolves `path` to an absolute path.
+   */
   public realPath(remotePath: string): Promise<string> {
     return new Promise((resolve, reject) => {
       const closeListener = utils.makeCloseListener(this, reject, 'realPath')
@@ -341,17 +547,12 @@ export class ScpClient extends EventEmitter {
       if (utils.haveConnection(this, 'realPath', reject)) {
         this.sftpWrapper!.realpath(remotePath, (err, absPath) => {
           if (err) {
-            if (err.code === 2) {
-              resolve('')
-            } else {
-              reject(
-                utils.formatError(
-                  `${err.message} ${remotePath}`,
-                  'realPath',
-                  err.code
-                )
+            reject(
+              utils.formatError(
+                `${err.message} ${remotePath}`,
+                'realPath'
               )
-            }
+            )
           }
           resolve(absPath)
           this.removeListener('error', errorListener)
