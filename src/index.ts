@@ -462,17 +462,10 @@ export class ScpClient extends EventEmitter {
    * Close SSH connection
    */
   public close() {
-    if (this.sftpWrapper) {
-      this.sftpWrapper.close(Buffer.alloc(1), (err => {
-        if (err) {
-          console.log('Error during closing sftpWrapper', err)
-        }
-      }))
-      this.sftpWrapper = null
-    }
-    if (this.sshClient) {
+    if (this.sshClient && this.sftpWrapper) {
       this.sshClient.end()
       this.sshClient = null
+      this.sftpWrapper = null
     }
 
     this.endCalled = true
