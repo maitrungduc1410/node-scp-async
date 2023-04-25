@@ -38,7 +38,7 @@
     "ssh2": "^1.11.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "^12.1.4",
+    "@commitlint/cli": "^17.6.1",
     "@commitlint/config-conventional": "^12.1.4",
     "@types/node": "^16.0.1",
     "@types/ssh2": "^1.11.5",
