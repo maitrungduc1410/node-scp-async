@@ -1296,6 +1296,36 @@ async function test() {
 test()
 ```
 
+## Events
+You can listen for any event [provided by SSH2](https://github.com/mscdex/ssh2#client) during an SSH session by passing `events` to `Connection options`
+
+For example:
+```ts
+try {
+  const client = await Client({
+    host: "server_ip",
+    port: 22,
+    username: "username",
+    tryKeyboard: true,
+    events: {
+      "keyboard-interactive": (
+        name,
+        instructions,
+        instructionsLang,
+        prompts,
+        finish
+      ) => {
+        finish(['my_password'])
+      },
+    },
+  });
+
+  client.close(); // remember to close connection after you finish
+} catch (e) {
+  console.log(e);
+}
+```
+
 ## Connection options
 Below are available options you can pass when connecting to server:
 * **agent** - _string_ - Path to ssh-agent's UNIX socket for ssh-agent-based user authentication. **Windows users: set to 'pageant' for authenticating with Pageant or (actual) path to a cygwin "UNIX socket."** **Default:** (none)
@@ -1485,5 +1515,7 @@ Below are available options you can pass when connecting to server:
 * **tryKeyboard** - _boolean_ - Try keyboard-interactive user authentication if primary user authentication method fails. If you set this to `true`, you need to handle the `keyboard-interactive` event. **Default:** `false`
 
 * **username** - _string_ - Username for authentication. **Default:** (none)
+
+* **events** - Object - List of events to listen to. **Default:** (none)
 # Support
 If you like this project, give me 1 ⭐️
