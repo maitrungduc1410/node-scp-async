@@ -34,6 +34,7 @@ And other new features:
   * [Append data to a file](#appends-data-to-a-file)
   * [Set the mode for a path](#sets-the-mode-for-path)
   * [Set the owner for a path](#sets-the-owner-for-path)
+  * [Events](#events)
   * [Connection options](#Connection-options)
 
 # Installation
