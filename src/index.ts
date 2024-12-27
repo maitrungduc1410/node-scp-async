@@ -626,10 +626,13 @@ export async function Client(options: TScpOptions): Promise<ScpClient> {
       reject(err);
     });
 
+    client.on("close", () => {
+      client.removeAllListeners();
+    });
+
     for (const event in options.events) {
       client.on(event, (...args) => {
-        // @ts-ignore
-        options.events![event as keyof ClientEvents]!(...args);
+        (options.events![event as keyof ClientEvents] as (...args: any[]) => void)(...args);
       });
     }
   });
