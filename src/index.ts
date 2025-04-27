@@ -312,18 +312,53 @@ export class ScpClient extends EventEmitter {
    */
   public async mkdir(
     remotePath: string,
-    attributes: InputAttributes = {}
+    attributes: InputAttributes = {},
+    options: { recursive?: boolean} = {}
   ): Promise<void> {
     utils.haveConnection(this, "mkdir");
-    return new Promise((resolve, reject) => {
-      this.sftpWrapper!.mkdir(remotePath, attributes, (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
+    
+    if (!options.recursive) {
+      // Simple case: create a single directory
+      return new Promise((resolve, reject) => {
+        this.sftpWrapper!.mkdir(remotePath, attributes, (err) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
       });
-    });
+    }
+    
+    // Recursive case: create parent directories if they don't exist
+    const parts = remotePath.split(this.remotePathSep).filter(p => p);
+    let currentPath = remotePath.startsWith(this.remotePathSep) ? this.remotePathSep : '';
+    
+    for (let i = 0; i < parts.length; i++) {
+      currentPath = currentPath ? utils.joinRemote(this, currentPath, parts[i]) : parts[i];
+      
+      try {
+        const exists = await this.exists(currentPath);
+        if (!exists) {
+          await new Promise<void>((resolve, reject) => {
+            this.sftpWrapper!.mkdir(currentPath, attributes, (err) => {
+              if (err) {
+                reject(err);
+              } else {
+                resolve();
+              }
+            });
+          });
+        } else if (exists !== 'd') {
+          throw new Error(`Cannot create directory '${remotePath}': Path exists and is not a directory`);
+        }
+      } catch (err: any) {
+        // Ignore error if directory already exists
+        if (err.code !== 'EEXIST') {
+          throw err;
+        }
+      }
+    }
   }
 
   public async exists(remotePath: string): Promise<string | boolean> {
