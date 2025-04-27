@@ -293,7 +293,10 @@ Client({
 }).then(client => {
   client.mkdir(
     '/server/path',
-    // attributes?: InputAttributes
+    // attributes?: InputAttributes,
+    // { 
+    //   recursive: true,
+    // }
   )
         .then(response => {
           client.close() // remember to close connection after you finish
@@ -322,7 +325,10 @@ async function test() {
     })
     await client.mkdir(
       '/server/path',
-      // attributes: InputAttributes
+      // attributes: InputAttributes,
+      // { 
+      //   recursive: true,
+      // }
     )
     client.close() // remember to close connection after you finish
   } catch (e) {
