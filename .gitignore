@@ -1,4 +1,7 @@
 node_modules
-lib
-test.js
-test.txt
+dist
+coverage
+docs/api
+*.log
+.DS_Store
+.env

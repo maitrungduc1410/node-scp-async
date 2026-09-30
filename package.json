@@ -1,49 +1,131 @@
 {
   "name": "node-scp",
-  "title": "SCP module for NodeJS",
-  "description": "Lightweight, fast and secure SCP function for NodeJS",
-  "version": "0.0.25",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "version": "1.0.0",
+  "description": "SCP and SFTP file transfer for Node.js. Works even when the server has no SFTP (Dropbear, OpenWrt, embedded and network devices).",
+  "keywords": [
+    "scp",
+    "sftp",
+    "ssh",
+    "ssh2",
+    "upload",
+    "download",
+    "deploy",
+    "file-transfer",
+    "dropbear",
+    "openwrt",
+    "embedded",
+    "cli",
+    "typescript",
+    "node-scp"
+  ],
   "license": "MIT",
-  "licenseFilename": "LICENSE",
-  "readmeFilename": "README.md",
   "author": {
     "name": "Mai Trung Duc",
     "email": "maitrungduc1410@gmail.com"
   },
+  "homepage": "https://github.com/maitrungduc1410/node-scp-async#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/maitrungduc1410/node-scp-async.git",
-    "baseUrl": "https://github.com/maitrungduc1410/node-scp-async"
+    "url": "git+https://github.com/maitrungduc1410/node-scp-async.git"
   },
   "bugs": {
     "url": "https://github.com/maitrungduc1410/node-scp-async/issues"
   },
-  "homepage": "https://github.com/maitrungduc1410/node-scp-async",
-  "keywords": [
-    "node scp",
-    "node scp async",
-    "node-scp",
-    "node-scp-async",
-    "scp node",
-    "scp nodejs"
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./legacy": {
+      "import": {
+        "types": "./dist/legacy.d.mts",
+        "default": "./dist/legacy.mjs"
+      },
+      "require": {
+        "types": "./dist/legacy.d.cts",
+        "default": "./dist/legacy.cjs"
+      }
+    },
+    "./scp2": {
+      "import": {
+        "types": "./dist/scp2.d.mts",
+        "default": "./dist/scp2.mjs"
+      },
+      "require": {
+        "types": "./dist/scp2.d.cts",
+        "default": "./dist/scp2.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.cts",
+  "bin": {
+    "node-scp": "./dist/cli.mjs"
+  },
+  "files": [
+    "dist"
   ],
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@12.8.1",
   "scripts": {
-    "watch": "tsc -w",
-    "build": "tsc",
-    "release": "standard-version"
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "test": "vitest run --project unit --project e2e",
+    "test:unit": "vitest run --project unit",
+    "test:e2e": "vitest run --project e2e",
+    "test:docker": "vitest run --project docker",
+    "test:external": "vitest run --project external",
+    "test:watch": "vitest --project unit --project e2e",
+    "coverage": "vitest run --project unit --project e2e --coverage",
+    "bench": "vitest bench --run",
+    "check:package": "publint --strict && attw --pack . --profile node16",
+    "smoke": "node scripts/smoke.cjs && node scripts/smoke.mjs",
+    "servers:up": "docker compose -f docker/compose.yml up -d --build --wait",
+    "servers:down": "docker compose -f docker/compose.yml down -v",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "pnpm build && node scripts/publish.mjs",
+    "docs:api": "typedoc"
   },
   "dependencies": {
-    "ssh2": "^1.16.0"
+    "@types/ssh2": "^1.15.6",
+    "ssh2": "^1.17.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "^12.1.4",
-    "@commitlint/config-conventional": "^12.1.4",
-    "@types/node": "^16.0.1",
-    "@types/ssh2": "^1.11.13",
-    "husky": "^7.0.1",
-    "standard-version": "^9.3.0",
-    "typescript": "^4.3.5"
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@biomejs/biome": "^2.5.14",
+    "@changesets/cli": "^3.0.3",
+    "@testcontainers/toxiproxy": "^12.2.0",
+    "@types/node": "^24.0.0",
+    "@types/ssh2-sftp-client": "^9.0.6",
+    "@vitest/coverage-v8": "^5.0.2",
+    "fast-check": "^4.10.2",
+    "node-ssh": "^13.2.1",
+    "publint": "^0.3.24",
+    "ssh2-sftp-client": "^12.1.1",
+    "testcontainers": "^12.2.0",
+    "tsdown": "^0.23.0",
+    "typedoc": "^0.28.20",
+    "typescript": "~6.0.3",
+    "vitest": "^5.0.2"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }

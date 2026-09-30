@@ -1,0 +1,42 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: cron
+      cronjob: '0 3 1,15 * *'
+    # Wait a week before proposing a fresh release, most malicious versions are pulled by then.
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 5
+    groups:
+      runtime:
+        dependency-type: production
+      dev-minor-and-patch:
+        dependency-type: development
+        update-types: [minor, patch]
+    commit-message:
+      prefix: deps
+      prefix-development: deps-dev
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: cron
+      cronjob: '0 3 1,15 * *'
+    groups:
+      actions:
+        patterns: ['*']
+    commit-message:
+      prefix: ci
+
+  - package-ecosystem: docker
+    directories: [/docker/openssh, /docker/dropbear]
+    schedule:
+      interval: cron
+      cronjob: '0 3 1,15 * *'
+    groups:
+      images:
+        patterns: ['*']
+    commit-message:
+      prefix: test

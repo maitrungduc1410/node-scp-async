@@ -1,0 +1,48 @@
+name: Release
+
+# Changesets opens a "Version packages" pull request from pending changesets. Merging it
+# publishes to npm with trusted publishing (OIDC), so no npm token is stored in the repository.
+on:
+  push:
+    branches: [master]
+
+permissions: {}
+
+concurrency: release
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # scripts/publish.mjs looks at existing tags.
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+      # Trusted publishing needs npm 11.5.1 or newer.
+      - run: npm install -g npm@latest
+      - run: pnpm install --frozen-lockfile
+      - id: changesets
+        uses: changesets/action@v2
+        with:
+          version: pnpm version-packages
+          publish: pnpm release
+          commit: 'chore: release'
+          title: 'chore: release'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # `uses: maitrungduc1410/node-scp-async@v1` resolves through the moving major tag.
+      - if: steps.changesets.outputs.published == 'true'
+        run: |
+          major="v$(node -p "require('./package.json').version.split('.')[0]")"
+          git tag -f "$major"
+          git push -f origin "$major"

@@ -1,0 +1,36 @@
+# Local test servers. Start with `pnpm servers:up`, stop with `pnpm servers:down`.
+#
+#   port 2201  OpenSSH, SFTP and SCP
+#   port 2202  OpenSSH, SFTP only (ForceCommand internal-sftp)
+#   port 2203  OpenSSH, SCP only (no SFTP subsystem)
+#   port 2204  Dropbear, SCP only (like OpenWrt)
+#   port 2210  port 2201 through Toxiproxy, control API on 8474
+#
+# Every server accepts user `test` with password `test`. Run the portable scenarios against any
+# of them, for example:
+#
+#   NODE_SCP_TEST_HOST=127.0.0.1 NODE_SCP_TEST_PORT=2204 NODE_SCP_TEST_PASSWORD=test \
+#   NODE_SCP_TEST_PROTOCOLS=scp pnpm test:external
+name: node-scp
+services:
+  openssh:
+    build: ./openssh
+    environment: { MODE: full }
+    ports: ['2201:22']
+  openssh-sftp-only:
+    build: ./openssh
+    environment: { MODE: sftp-only }
+    ports: ['2202:22']
+  openssh-no-sftp:
+    build: ./openssh
+    environment: { MODE: no-sftp }
+    ports: ['2203:22']
+  dropbear:
+    build: ./dropbear
+    ports: ['2204:22']
+  toxiproxy:
+    image: ghcr.io/shopify/toxiproxy:2.12.0
+    ports: ['8474:8474', '2210:2210']
+    depends_on: [openssh]
+    entrypoint: ['/toxiproxy', '-host=0.0.0.0', '-config=/config/toxiproxy.json']
+    volumes: ['./toxiproxy.json:/config/toxiproxy.json:ro']

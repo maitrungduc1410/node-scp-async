@@ -1,0 +1,112 @@
+name: node-scp
+description: Copy files to or from a server over SFTP or SCP. Works with Dropbear, OpenWrt and other devices without SFTP.
+author: Mai Trung Duc
+branding:
+  icon: upload-cloud
+  color: blue
+
+inputs:
+  host:
+    description: Server host name or IP address.
+    required: true
+  port:
+    description: SSH port.
+    default: '22'
+  username:
+    description: User name.
+    required: true
+  password:
+    description: Password. Prefer private-key.
+    default: ''
+  private-key:
+    description: Private key contents, for example secrets.DEPLOY_KEY.
+    default: ''
+  passphrase:
+    description: Passphrase for the private key.
+    default: ''
+  fingerprint:
+    description: Expected host key fingerprints, SHA256:... as printed by `ssh-keygen -lf`. Comma separated. Strongly recommended.
+    default: ''
+  source:
+    description: Paths to copy, one per line. Local paths for uploads, remote paths for downloads.
+    required: true
+  target:
+    description: Destination. A remote path for uploads, a local path for downloads. End it with / to copy into a directory.
+    required: true
+  direction:
+    description: upload or download.
+    default: upload
+  protocol:
+    description: auto, sftp or scp.
+    default: auto
+  recursive:
+    description: Copy directories.
+    default: 'true'
+  preserve:
+    description: Keep file modes and times.
+    default: 'false'
+  exclude:
+    description: Patterns to skip, one per line, for example node_modules or *.map.
+    default: ''
+  concurrency:
+    description: Parallel files for SFTP directory copies.
+    default: '4'
+  version:
+    description: node-scp version to run.
+    default: '1'
+
+runs:
+  using: composite
+  steps:
+    - name: Copy files
+      shell: bash
+      env:
+        NODE_SCP_PASSWORD: ${{ inputs.password }}
+        NODE_SCP_PRIVATE_KEY: ${{ inputs.private-key }}
+        NODE_SCP_PASSPHRASE: ${{ inputs.passphrase }}
+        NODE_SCP_FINGERPRINT: ${{ inputs.fingerprint }}
+        INPUT_HOST: ${{ inputs.host }}
+        INPUT_PORT: ${{ inputs.port }}
+        INPUT_USERNAME: ${{ inputs.username }}
+        INPUT_SOURCE: ${{ inputs.source }}
+        INPUT_TARGET: ${{ inputs.target }}
+        INPUT_DIRECTION: ${{ inputs.direction }}
+        INPUT_PROTOCOL: ${{ inputs.protocol }}
+        INPUT_RECURSIVE: ${{ inputs.recursive }}
+        INPUT_PRESERVE: ${{ inputs.preserve }}
+        INPUT_EXCLUDE: ${{ inputs.exclude }}
+        INPUT_CONCURRENCY: ${{ inputs.concurrency }}
+        INPUT_VERSION: ${{ inputs.version }}
+      run: |
+        set -euo pipefail
+        remote="${INPUT_USERNAME}@${INPUT_HOST}"
+        case "$INPUT_HOST" in *:*) remote="${INPUT_USERNAME}@[${INPUT_HOST}]" ;; esac
+
+        args=(--port "$INPUT_PORT" --protocol "$INPUT_PROTOCOL" --concurrency "$INPUT_CONCURRENCY")
+        [ "$INPUT_RECURSIVE" = "true" ] && args+=(--recursive)
+        [ "$INPUT_PRESERVE" = "true" ] && args+=(--preserve)
+        while IFS= read -r pattern; do
+          [ -n "$pattern" ] && args+=(--exclude "$pattern")
+        done <<< "$INPUT_EXCLUDE"
+
+        sources=()
+        while IFS= read -r path; do
+          [ -z "$path" ] && continue
+          if [ "$INPUT_DIRECTION" = "download" ]; then
+            sources+=("${remote}:${path}")
+          else
+            sources+=("$path")
+          fi
+        done <<< "$INPUT_SOURCE"
+        if [ "${#sources[@]}" -eq 0 ]; then
+          echo "::error::source is empty"
+          exit 1
+        fi
+
+        case "$INPUT_DIRECTION" in
+          upload) target="${remote}:${INPUT_TARGET}" ;;
+          download) target="$INPUT_TARGET" ;;
+          *) echo "::error::direction must be upload or download"; exit 1 ;;
+        esac
+
+        npx --yes "node-scp@${INPUT_VERSION}" "${args[@]}" -- "${sources[@]}" "$target"

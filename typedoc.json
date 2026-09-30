@@ -1,0 +1,15 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "name": "node-scp",
+  "entryPoints": ["src/index.ts", "src/legacy/index.ts", "src/scp2/index.ts"],
+  "out": "docs/api",
+  "readme": "README.md",
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "includeVersion": true,
+  "sort": ["kind", "instance-first", "alphabetical"],
+  "navigationLinks": {
+    "GitHub": "https://github.com/maitrungduc1410/node-scp-async",
+    "npm": "https://www.npmjs.com/package/node-scp"
+  }
+}

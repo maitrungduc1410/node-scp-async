@@ -1,0 +1,137 @@
+# Working on node-scp
+
+Guidance for AI coding agents and humans new to the repository. Read
+[ARCHITECTURE.md](ARCHITECTURE.md) first for how the pieces fit together.
+
+## Setup
+
+- Node.js 22 or newer for development (the package itself supports 20+).
+- pnpm, the version is pinned in `package.json` (`corepack enable` picks it up).
+- Packages come from the public npm registry. The repository `.npmrc` sets it; do not add
+  other registries, and do not commit a lockfile that points anywhere else.
+- For the end to end tests: the OpenSSH `scp` binary and an `sftp-server` binary
+  (`openssh-client` and `openssh-sftp-server` on Debian and Ubuntu). Without them the e2e tests
+  are skipped, not failed, so check the output.
+
+```sh
+pnpm install
+pnpm test
+```
+
+## Commands
+
+| Command | What it does |
+| --- | --- |
+| `pnpm lint` / `pnpm format` | Biome check / fix. |
+| `pnpm typecheck` | `tsc --noEmit`, strict. |
+| `pnpm build` | tsdown, ESM and CommonJS into `dist/`. |
+| `pnpm check:package` | publint and Are The Types Wrong on the packed tarball. |
+| `pnpm smoke` | Loads the built package with `require` and `import`. Run after `build`. |
+| `pnpm test` | Unit and e2e tests, runs in seconds, no network. |
+| `pnpm coverage` | Same with coverage. |
+| `pnpm test:docker` | Real OpenSSH (three modes), Dropbear and Toxiproxy through testcontainers. Needs Docker. |
+| `pnpm test:external` | The shared scenarios against any server, see below. |
+| `pnpm bench` | Benchmarks against the in process server or `NODE_SCP_BENCH_*`. |
+| `pnpm docs:api` | TypeDoc into `docs/api/`. |
+| `pnpm changeset` | Add a release note, required for user visible changes. |
+
+Before handing work back, run `pnpm lint && pnpm typecheck && pnpm test && pnpm build &&
+pnpm check:package && pnpm smoke`.
+
+### Testing against a real server
+
+```sh
+NODE_SCP_TEST_HOST=127.0.0.1 NODE_SCP_TEST_PORT=2201 \
+NODE_SCP_TEST_USER=test NODE_SCP_TEST_PASSWORD=test \
+NODE_SCP_TEST_PROTOCOLS=sftp,scp pnpm test:external
+```
+
+Other variables: `NODE_SCP_TEST_KEY` (path to a private key), `NODE_SCP_TEST_REMOTE_BASE`
+(working directory on the server, it is removed afterwards) and `NODE_SCP_TEST_REMOTE_OS=win32`.
+`pnpm servers:up` starts the Docker servers from `docker/compose.yml` on ports 2201 to 2204.
+
+## Where things live
+
+| Path | Contents |
+| --- | --- |
+| `src/index.ts` | Public API of `node-scp`. Anything exported here is semver protected. |
+| `src/client.ts` | `connect()`, protocol negotiation, `ScpClient`. |
+| `src/sftp/`, `src/scp/` | The two transports behind the `Transport` interface in `src/transport.ts`. |
+| `src/scp/protocol.ts` | SCP record parsing and building, and name validation. Pure functions. |
+| `src/names.ts` | Rules shared by both transports: safe received names, modes of new copies. |
+| `src/transfer/` | Local tree walking, the concurrency queue, progress aggregation. |
+| `src/shell.ts`, `src/remote-path.ts` | Quoting for remote shells, POSIX and Windows paths. |
+| `src/errors.ts` | `ScpError`, `ErrorCode` and the mapping from ssh2 and SFTP errors. |
+| `src/legacy/`, `src/scp2/` | Compatibility layers for `node-scp/legacy` and `node-scp/scp2`. |
+| `src/cli/` | The `node-scp` command. `main()` takes argv and IO so it can be tested in process. |
+| `test/harness/server.ts` | In process ssh2 server that runs the real `scp` and `sftp-server`, with switches to simulate other servers. |
+| `test/scenarios.ts` | Scenarios shared by e2e, docker and external suites. |
+| `docker/` | Images and compose file for the server matrix. |
+| `action.yml` | The GitHub Action, a wrapper around the CLI. |
+| `docs/` | Guides linked from the README. `docs/api/` is generated and ignored. |
+
+## Rules
+
+### Code
+
+- TypeScript strict. No `any`, no `@ts-ignore`. Use `unknown` and narrow.
+- Every error that leaves the library is a `ScpError` with an `ErrorCode`. Keep the original
+  error as `cause`. New failure kinds get a new code, and a line in the README error table.
+- Both transports must behave the same. When you change transfer semantics, change both and add
+  the case to `test/scenarios.ts` so every server runs it.
+- Keep `src/scp/protocol.ts` free of I/O so it stays unit testable.
+- Public options get TSDoc comments; TypeDoc builds the API reference from them.
+- Match the existing style: small modules, private `#fields`, no default exports outside the
+  compatibility layers.
+
+### Security
+
+These protect users against malicious servers. Do not weaken them, and add a test when you
+touch them.
+
+- Every name received from a server, in SCP records and SFTP listings alike, must be a single
+  path segment: no `/`, `..`, NUL or empty names, and no `\` or `:` when the local side is
+  Windows. See `isSafeReceivedName` in `src/names.ts`.
+- SFTP copies are opened twice (once to create with the right mode, once by ssh2), so a new
+  file must stay owner writable until its data is in. Test permission changes against a real
+  server as a non root user; the harness runs as root and cannot catch this.
+- Without `preserve`, copies get permission bits only (`creationMode` in `src/names.ts`), never
+  setuid, setgid or sticky bits.
+- Refuse directories in a non recursive download, and anything beyond the one requested top
+  level entry.
+- Every remote path that reaches a shell goes through `quoteArg`. Never build a command by
+  string concatenation of user input.
+- The CLI must keep warning when the host key is not pinned.
+
+### Compatibility layers
+
+`node-scp/legacy` must keep the 0.x API and return values, and `node-scp/scp2` the scp2 API.
+Tests in `test/e2e/compat.test.ts` pin them. Improve the internals freely, but treat any
+visible change there as breaking.
+
+### Writing
+
+- Documentation, comments and commit messages are in English.
+- Do not use em dashes or en dashes anywhere in the repository. Use commas, colons, parentheses
+  or separate sentences.
+- No references to private hosts, registries, company names or internal tools in code, tests,
+  docs or lockfiles.
+- Comments explain constraints the code cannot show. Do not narrate what the next line does.
+
+### Releases
+
+- Add a changeset (`pnpm changeset`) for every user visible change. Patch for fixes, minor for
+  features, major for breaking changes.
+- Do not edit `version` in `package.json` or `CHANGELOG.md` by hand; the release workflow does
+  that and publishes with npm provenance through trusted publishing.
+- Scheduled workflows run twice a month. Do not make them more frequent.
+
+## Common pitfalls
+
+- **The e2e tests were skipped.** Install `openssh-sftp-server` and `openssh-client`.
+- **SCP tests hang.** A server that never answers `scp -t` is caught by `handshakeTimeout`
+  (the `readyTimeout`). If a new test hangs, look for a missing status byte in the harness.
+- **Symlink tests on the harness.** ssh2 swaps the `symlink` arguments only for servers that
+  identify as OpenSSH, and the harness does not. Create test symlinks locally instead.
+- **Slow small file transfers.** Check that `noDelay` was not turned off.
+- **`pnpm docs` does nothing useful.** It is a pnpm built in; the script is `pnpm docs:api`.

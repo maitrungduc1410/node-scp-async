@@ -1,0 +1,8 @@
+[
+  {
+    "name": "openssh",
+    "listen": "0.0.0.0:2210",
+    "upstream": "openssh:22",
+    "enabled": true
+  }
+]

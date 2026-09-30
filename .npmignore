@@ -1,9 +1,0 @@
-node_modules
-src
-.git*
-tsconfig.json
-tslint.json
-test.js
-.github
-.husky
-commitlint.config.js

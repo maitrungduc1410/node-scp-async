@@ -1,0 +1,72 @@
+name: Scheduled
+
+# Every two weeks: the slow or flaky checks that do not need to block pull requests.
+on:
+  schedule:
+    - cron: '0 3 1,15 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    name: Windows OpenSSH
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Start OpenSSH server with a throwaway user
+        shell: pwsh
+        run: |
+          $password = 'Np1-' + [guid]::NewGuid().ToString('N')
+          Write-Output "::add-mask::$password"
+          net user nodescp $password /add /y
+          Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
+          Set-Service -Name sshd -StartupType Manual
+          Start-Service sshd
+          "NODE_SCP_TEST_PASSWORD=$password" | Out-File -FilePath $env:GITHUB_ENV -Append
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test:external
+        env:
+          NODE_SCP_TEST_HOST: 127.0.0.1
+          NODE_SCP_TEST_USER: nodescp
+          NODE_SCP_TEST_REMOTE_OS: win32
+          NODE_SCP_TEST_PROTOCOLS: sftp,scp
+
+  docker:
+    name: Real servers with the newest images
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: docker pull debian:stable-slim && docker pull alpine:3.22
+      - run: pnpm test:docker
+
+  bench:
+    name: Benchmarks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends openssh-client openssh-sftp-server
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm bench --reporter=verbose | tee bench.txt
+      - uses: actions/upload-artifact@v7
+        with:
+          name: bench
+          path: bench.txt
+          retention-days: 90

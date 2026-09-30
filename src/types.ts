@@ -1,142 +1,109 @@
-import type {
-  AcceptConnection,
-  ChangePasswordCallback,
-  ClientChannel,
-  ClientErrorExtensions,
-  KeyboardInteractiveCallback,
-  NegotiatedAlgorithms,
-  ParsedKey,
-  Prompt,
-  RejectConnection,
-  TcpConnectionDetails,
-  UNIXConnectionDetails,
-  X11Details,
-} from "ssh2";
+import type { ConnectConfig, Client as SshClient } from 'ssh2';
+import type { RemoteOs } from './remote-path';
 
-export class ErrorCustom extends Error {
-  custom?: boolean;
-  code?: string;
-  level?: string;
-  hostname?: string;
-  address?: string;
+/**
+ * Which wire protocol to use for transfers.
+ *
+ * - `sftp`: SFTP subsystem only. Fails with `ERR_SFTP_UNAVAILABLE` when the server has none.
+ * - `scp`: the classic SCP protocol over an exec channel (`scp -t` / `scp -f`).
+ * - `auto` (default): SFTP when available, otherwise SCP.
+ */
+export type Protocol = 'auto' | 'sftp' | 'scp';
+
+/** The protocol a connected client actually uses. */
+export type ActiveProtocol = Exclude<Protocol, 'auto'>;
+
+export interface ConnectOptions extends ConnectConfig {
+  /** Transfer protocol. Defaults to `auto`. */
+  protocol?: Protocol;
+  /** Path flavour and shell quoting rules of the remote host. Defaults to `posix`. */
+  remoteOs?: RemoteOs;
+  /** Remote command used for SCP transfers. Defaults to `scp`. */
+  scpCommand?: string;
+  /** Aborts the connection attempt. */
+  signal?: AbortSignal;
+  /**
+   * Disables Nagle's algorithm on the TCP socket. SCP and SFTP wait for a reply after small
+   * messages, so leaving Nagle on makes many small files up to 25 times slower. Defaults to `true`.
+   */
+  noDelay?: boolean;
+  /**
+   * Called with the underlying ssh2 client before connecting. Use it to attach listeners that
+   * must exist before authentication, for example `keyboard-interactive` or `banner`.
+   */
+  beforeConnect?: (ssh: SshClient) => void;
 }
-export interface CheckResult {
+
+export type EntryType = 'file' | 'directory' | 'symlink' | 'other';
+
+export interface EntryInfo {
+  type: EntryType;
+  size: number;
+  mode: number;
+}
+
+export interface TransferProgress {
+  /** Path of the file currently moving, relative to the transfer root, using `/`. */
   path: string;
-  type?: string;
-  valid?: boolean;
-  msg?: string;
-  code?: string;
+  /** Bytes of the current file transferred so far. */
+  fileTransferred: number;
+  /** Size of the current file in bytes. */
+  fileSize: number;
+  /** Bytes transferred in the whole operation so far. */
+  transferred: number;
+  /** Total bytes of the operation, when known up front. SCP downloads do not know it. */
+  total: number | undefined;
+  /** Files finished so far. */
+  filesCompleted: number;
+  /** Total number of files, when known up front. */
+  filesTotal: number | undefined;
 }
 
-export interface ClientEvents {
+export interface TransferOptions {
+  /** Required to copy directories, like `scp -r`. */
+  recursive?: boolean;
   /**
-   * Emitted when a notice was sent by the server upon connection.
+   * Keep modification and access times and the full mode, including setuid, setgid and sticky
+   * bits, also on files that already exist, like `scp -p`. Without it new files still get the
+   * source's permission bits, reduced by the umask, and existing files keep their mode.
    */
-  banner?: (message: string) => void;
+  preserve?: boolean;
+  /**
+   * Maximum files transferred in parallel for directory copies. SFTP only, SCP streams one file
+   * at a time over a single channel. Defaults to 4.
+   */
+  concurrency?: number;
+  /**
+   * Decides whether an entry is copied. `path` is relative to the transfer root and uses `/`.
+   * Returning `false` for a directory skips the whole subtree.
+   */
+  filter?: (path: string, entry: EntryInfo) => boolean;
+  /** Called whenever bytes move. */
+  onProgress?: (progress: TransferProgress) => void;
+  /** Cancels the transfer. Files already in flight over SFTP finish in the background. */
+  signal?: AbortSignal;
+}
 
-  /**
-   * Emitted when authentication was successful.
-   */
-  ready?: () => void;
+export interface TransferResult {
+  /** Number of files copied. */
+  files: number;
+  /** Number of directories created or entered. */
+  directories: number;
+  /** Number of bytes copied. */
+  bytes: number;
+}
 
+export interface WriteFileOptions {
+  /** File mode for newly created files. Defaults to `0o644`. */
+  mode?: number;
   /**
-   * Emitted when an incoming forwarded TCP connection is being requested.
-   *
-   * Calling `accept()` accepts the connection and returns a `Channel` object.
-   * Calling `reject()` rejects the connection and no further action is needed.
+   * Size of a stream source. SCP must announce the size before sending, so over SCP a stream
+   * without `size` is read into memory first.
    */
-  "tcp connection"?: (
-    details: TcpConnectionDetails,
-    accept: AcceptConnection<ClientChannel>,
-    reject: RejectConnection
-  ) => void;
+  size?: number;
+  signal?: AbortSignal;
+}
 
-  /**
-   * Emitted when an incoming X11 connection is being requested.
-   *
-   * Calling `accept()` accepts the connection and returns a `Channel` object.
-   * Calling `reject()` rejects the connection and no further action is needed.
-   */
-  x11?: (
-    details: X11Details,
-    accept: AcceptConnection<ClientChannel>,
-    reject: RejectConnection
-  ) => void;
-
-  /**
-   * Emitted when the server is asking for replies to the given `prompts` for keyboard-
-   * interactive user authentication.
-   *
-   * * `name` is generally what you'd use as a window title (for GUI apps).
-   * * `prompts` is an array of `Prompt` objects.
-   *
-   * The answers for all prompts must be provided as an array of strings and passed to
-   * `finish` when you are ready to continue.
-   *
-   * NOTE: It's possible for the server to come back and ask more questions.
-   */
-  "keyboard-interactive"?: (
-    name: string,
-    instructions: string,
-    lang: string,
-    prompts: Prompt[],
-    finish: KeyboardInteractiveCallback
-  ) => void;
-
-  /**
-   * Emitted when the server has requested that the user's password be changed, if using
-   * password-based user authentication.
-   *
-   * Call `done` with the new password.
-   */
-  "change password"?: (message: string, done: ChangePasswordCallback) => void;
-
-  /**
-   * Emitted when an error occurred.
-   */
-  error?: (err: Error & ClientErrorExtensions) => void;
-
-  /**
-   * Emitted when the socket was disconnected.
-   */
-  end?: () => void;
-
-  /**
-   * Emitted when the socket was closed.
-   */
-  close?: () => void;
-
-  /**
-   * Emitted when the socket has timed out.
-   */
-  timeout?: () => void;
-
-  /**
-   * Emitted when the socket has connected.
-   */
-  connect?: () => void;
-
-  /**
-   * Emitted when the server responds with a greeting message.
-   */
-  greeting?: (greeting: string) => void;
-
-  /**
-   * Emitted when a handshake has completed (either initial or rekey).
-   */
-  handshake?: (negotiated: NegotiatedAlgorithms) => void;
-
-  /**
-   * Emitted when the server announces its available host keys.
-   */
-  hostkeys?: (keys: ParsedKey[]) => void;
-
-  /**
-   * An incoming forwarded UNIX socket connection is being requested.
-   */
-  "unix connection"?: (
-    info: UNIXConnectionDetails,
-    accept: AcceptConnection,
-    reject: RejectConnection
-  ) => void;
+export interface ReadFileOptions {
+  signal?: AbortSignal;
 }
