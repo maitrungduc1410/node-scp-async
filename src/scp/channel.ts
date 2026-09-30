@@ -62,7 +62,12 @@ export class ScpChannel {
         resolve();
       });
     });
-    this.#onAbort = () => stream.destroy();
+    // ssh2 only queues CHANNEL_CLOSE behind the data already sent, and 'close' waits for the
+    // server's reply, which on a congested link can take minutes. Waiters fail right away.
+    this.#onAbort = () => {
+      this.reader.fail(abortError(options.signal!));
+      stream.destroy();
+    };
     options.signal?.addEventListener('abort', this.#onAbort, { once: true });
   }
 
@@ -124,10 +129,16 @@ export class ScpChannel {
 
   write(data: string | Buffer): Promise<void> {
     if (this.#closed) return Promise.reject(this.#closedError());
+    const signal = this.#signal;
+    if (signal?.aborted) return Promise.reject(abortError(signal));
     return new Promise<void>((resolve, reject) => {
       const onClose = () => {
         cleanup();
         reject(this.#closedError());
+      };
+      const onAbort = () => {
+        cleanup();
+        reject(abortError(signal!));
       };
       const onDrain = () => {
         cleanup();
@@ -136,8 +147,10 @@ export class ScpChannel {
       const cleanup = () => {
         this.#stream.off('close', onClose);
         this.#stream.off('drain', onDrain);
+        signal?.removeEventListener('abort', onAbort);
       };
       this.#stream.once('close', onClose);
+      signal?.addEventListener('abort', onAbort, { once: true });
       if (this.#stream.write(data)) {
         cleanup();
         resolve();

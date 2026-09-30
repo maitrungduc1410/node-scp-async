@@ -29,6 +29,25 @@ await client.upload('./build', '/tmp/build', { recursive: true });
 - **Batteries.** A CLI (`npx node-scp`), a GitHub Action, and drop in layers for node-scp 0.x
   and `scp2`.
 
+## Contents
+
+- [Install](#install)
+- [Usage](#usage)
+  - [Connect, copy, close](#connect-copy-close)
+  - [One shot helpers](#one-shot-helpers)
+  - [Transfer options](#transfer-options)
+  - [Files in memory](#files-in-memory)
+  - [Remote filesystem](#remote-filesystem)
+  - [Choosing the protocol](#choosing-the-protocol)
+  - [Errors](#errors)
+- [Command line](#command-line)
+- [GitHub Action](#github-action)
+- [Upgrading](#upgrading)
+- [More reading](#more-reading)
+- [Benchmarks](#benchmarks)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Install
 
 ```sh
@@ -134,7 +153,7 @@ for jump hosts, ...) plus:
 
 | Option | Default | Meaning |
 | --- | --- | --- |
-| `remoteOs` | `'posix'` | `'win32'` for Windows OpenSSH servers: backslash paths and `cmd.exe` quoting. |
+| `remoteOs` | `'posix'` | `'win32'` for Windows OpenSSH servers: backslash paths, and quoting that is safe for `cmd.exe` and PowerShell. |
 | `scpCommand` | `'scp'` | Remote SCP command, for example `/usr/bin/scp` when `scp` is not on the remote `PATH`. |
 | `noDelay` | `true` | Disable Nagle's algorithm. Leave it on unless you have a reason. |
 | `signal` | | Abort the connection attempt. |

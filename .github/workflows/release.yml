@@ -1,17 +1,26 @@
 name: Release
 
-# Changesets opens a "Version packages" pull request from pending changesets. Merging it
-# publishes to npm with trusted publishing (OIDC), so no npm token is stored in the repository.
+# One job does the whole release, and every step can be rerun safely:
+#   1. Pending changesets: open or update the "chore: release" pull request that bumps the
+#      version and writes CHANGELOG.md.
+#   2. A version that is not on npm yet (for example after merging that pull request): publish
+#      it with trusted publishing (OIDC), so no npm token is stored in the repository.
+#   3. Create the GitHub release vX.Y.Z from its CHANGELOG.md section.
+#   4. Move the major tag (v1) that `uses: maitrungduc1410/node-scp-async@v1` resolves.
 on:
   push:
     branches: [master]
+  workflow_dispatch:
 
 permissions: {}
 
-concurrency: release
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
   release:
+    name: Release
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -19,9 +28,6 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v7
-        with:
-          # scripts/publish.mjs looks at existing tags.
-          fetch-depth: 0
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
         with:
@@ -31,18 +37,72 @@ jobs:
       # Trusted publishing needs npm 11.5.1 or newer.
       - run: npm install -g npm@latest
       - run: pnpm install --frozen-lockfile
+
       - id: changesets
+        name: Open the release pull request
         uses: changesets/action@v2
         with:
-          version: pnpm version-packages
-          publish: pnpm release
-          commit: 'chore: release'
-          title: 'chore: release'
+          version-script: pnpm version-packages
+          commit-message: 'chore: release'
+          pr-title: 'chore: release'
+
+      - id: plan
+        name: Decide what to release
+        if: steps.changesets.outputs.has-changesets == 'false'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # `uses: maitrungduc1410/node-scp-async@v1` resolves through the moving major tag.
-      - if: steps.changesets.outputs.published == 'true'
+          GH_TOKEN: ${{ github.token }}
         run: |
-          major="v$(node -p "require('./package.json').version.split('.')[0]")"
-          git tag -f "$major"
-          git push -f origin "$major"
+          version="$(node -p "require('./package.json').version")"
+          name="$(node -p "require('./package.json').name")"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if npm view "$name@$version" version > /dev/null 2>&1; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "$name@$version is already on npm"
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+          if gh release view "v$version" > /dev/null 2>&1; then
+            echo "release=false" >> "$GITHUB_OUTPUT"
+            echo "GitHub release v$version already exists"
+          else
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          fi
+          case "$version" in
+            *-*) echo "prerelease=true" >> "$GITHUB_OUTPUT" ;;
+            *) echo "prerelease=false" >> "$GITHUB_OUTPUT" ;;
+          esac
+
+      - name: Build and check the package
+        if: steps.plan.outputs.publish == 'true'
+        run: |
+          pnpm build
+          pnpm check:package
+          pnpm smoke
+
+      - name: Publish to npm
+        if: steps.plan.outputs.publish == 'true'
+        run: >-
+          npm publish --access public --provenance
+          --tag ${{ steps.plan.outputs.prerelease == 'true' && 'next' || 'latest' }}
+
+      - name: Create the GitHub release
+        if: steps.plan.outputs.release == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.plan.outputs.version }}
+          PRERELEASE: ${{ steps.plan.outputs.prerelease }}
+        run: |
+          node scripts/release-notes.mjs "$VERSION" > "$RUNNER_TEMP/notes.md"
+          flags=()
+          [ "$PRERELEASE" = "true" ] && flags+=(--prerelease)
+          gh release create "v$VERSION" --target "$GITHUB_SHA" --title "v$VERSION" \
+            --notes-file "$RUNNER_TEMP/notes.md" "${flags[@]}"
+
+      - name: Move the major tag
+        if: steps.plan.outputs.release == 'true' && steps.plan.outputs.prerelease == 'false'
+        env:
+          VERSION: ${{ steps.plan.outputs.version }}
+        run: |
+          major="v${VERSION%%.*}"
+          git tag -f "$major" "$GITHUB_SHA"
+          git push -f origin "refs/tags/$major"

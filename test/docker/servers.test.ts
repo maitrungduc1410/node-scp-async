@@ -20,6 +20,7 @@ import { defineTransferScenarios } from '../scenarios';
  * `pnpm test:docker`.
  */
 const dockerDir = fileURLToPath(new URL('../../docker', import.meta.url));
+const OPENSSH_IMAGE = 'node-scp-test-openssh';
 
 interface Servers {
   network: StartedNetwork;
@@ -44,8 +45,8 @@ function options(container: StartedTestContainer, extra: Partial<ConnectOptions>
 }
 
 beforeAll(async () => {
-  const [openssh, dropbearImage] = await Promise.all([
-    GenericContainer.fromDockerfile(join(dockerDir, 'openssh')).build('node-scp-test-openssh', {
+  const [, dropbearImage] = await Promise.all([
+    GenericContainer.fromDockerfile(join(dockerDir, 'openssh')).build(OPENSSH_IMAGE, {
       deleteOnExit: false,
     }),
     GenericContainer.fromDockerfile(join(dockerDir, 'dropbear')).build('node-scp-test-dropbear', {
@@ -53,8 +54,10 @@ beforeAll(async () => {
     }),
   ]);
   const network = await new Network().start();
+  // One GenericContainer per server: its with* methods mutate shared create options, so
+  // reusing one would give every server the last MODE.
   const sshd = (mode: string) =>
-    openssh
+    new GenericContainer(OPENSSH_IMAGE)
       .withEnvironment({ MODE: mode })
       .withExposedPorts(22)
       .withWaitStrategy(Wait.forLogMessage(/Server listening/));

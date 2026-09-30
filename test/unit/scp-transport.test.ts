@@ -62,6 +62,44 @@ describe('ScpTransport cancellation', () => {
     ).rejects.toMatchObject({ code: ErrorCode.Aborted });
   });
 
+  it('aborts a congested upload without waiting for the channel to close', async () => {
+    // Like ssh2 on a slow link: destroy() only queues a close request, so neither 'drain' nor
+    // 'close' arrives for a long time.
+    let records = 0;
+    const channel = new Duplex({
+      writableHighWaterMark: 1,
+      read() {},
+      write(_chunk, _encoding, callback) {
+        if (records++ === 0) {
+          channel.push(Buffer.from([0]));
+          callback();
+        }
+      },
+    }) as Duplex & { stderr: PassThrough };
+    channel.stderr = new PassThrough();
+    channel.destroy = () => channel;
+    const ssh = {
+      exec(_command: string, callback: (err: Error | undefined, channel: Duplex) => void) {
+        setImmediate(() => {
+          channel.push(Buffer.from([0]));
+          callback(undefined, channel);
+        });
+      },
+    } as unknown as SshClient;
+    const transport = new ScpTransport(ssh, {
+      scpCommand: 'scp',
+      paths: remotePath('posix'),
+      handshakeTimeout: 0,
+    });
+    const controller = new AbortController();
+    setTimeout(() => controller.abort(), 50);
+    const started = Date.now();
+    await expect(
+      transport.writeFile('/f', Buffer.alloc(1024 * 1024), { signal: controller.signal }),
+    ).rejects.toMatchObject({ code: ErrorCode.Aborted });
+    expect(Date.now() - started).toBeLessThan(1000);
+  });
+
   it('honours an abort when the server never answers the exec request', async () => {
     const controller = new AbortController();
     const ssh = {

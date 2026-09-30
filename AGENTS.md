@@ -124,6 +124,10 @@ visible change there as breaking.
   features, major for breaking changes.
 - Do not edit `version` in `package.json` or `CHANGELOG.md` by hand; the release workflow does
   that and publishes with npm provenance through trusted publishing.
+- `.github/workflows/release.yml` is the only release path: it opens the "chore: release" pull
+  request, publishes a version that is not on npm yet, creates the GitHub release from the
+  CHANGELOG.md section (`scripts/release-notes.mjs`) and moves the major tag (`v1`). Every step
+  checks first, so rerunning a failed release is safe.
 - Scheduled workflows run twice a month. Do not make them more frequent.
 
 ## Common pitfalls

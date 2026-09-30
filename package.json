@@ -99,7 +99,6 @@
     "servers:down": "docker compose -f docker/compose.yml down -v",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "pnpm build && node scripts/publish.mjs",
     "docs:api": "typedoc"
   },
   "dependencies": {

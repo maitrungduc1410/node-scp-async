@@ -84,9 +84,12 @@ describe('quoteWindows', () => {
     fc.assert(fc.property(windowsPath, (path) => parse(quoteWindows(path)) === path));
   });
 
-  it.each(['a"b', '100%', 'hey!', 'a^b', 'line\nbreak'])('rejects %j', (value) => {
-    expect(() => quoteWindows(value)).toThrow(/Windows shell/);
-  });
+  it.each(['a"b', '100%', 'hey!', 'a^b', 'line\nbreak', 'C:\\$(calc)', 'a`b'])(
+    'rejects %j',
+    (value) => {
+      expect(() => quoteWindows(value)).toThrow(/Windows shell/);
+    },
+  );
 
   it('is picked by quoteArg for win32', () => {
     expect(quoteArg('x y', 'win32')).toBe('"x y"');

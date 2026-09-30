@@ -43,6 +43,12 @@ export class ByteReader {
     });
   }
 
+  /** Makes every pending and future read fail with `err`, without waiting for the stream. */
+  fail(err: Error): void {
+    this.#error ??= err;
+    this.#notify();
+  }
+
   /** Reads one byte, or returns `null` at a clean end of stream. */
   async readByte(): Promise<number | null> {
     if (!(await this.#fill(1))) return null;

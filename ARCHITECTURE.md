@@ -234,8 +234,9 @@ flowchart LR
 - **Remote paths reach the shell as one literal word.** POSIX paths go in single quotes (`'`
   becomes `'\''`), so `$()`, backticks, globs, `~` and spaces reach `scp` literally. Paths made
   only of `A-Za-z0-9_@%+=:,./-` need no quoting and are sent bare, which is what devices without
-  a real shell expect. Windows paths are double quoted and characters that `cmd.exe` interprets
-  even inside quotes (`"`, `%`, `!`, `^`) are refused. A property test feeds random strings
+  a real shell expect. Windows paths are double quoted and characters that `cmd.exe` or
+  PowerShell interpret even inside quotes (`"`, `%`, `!`, `^`, `$`, backtick) are refused
+  (`isSafeForWindowsShell`). A property test feeds random strings
   through a real `/bin/sh` to check this.
 - **Names from the server are one path segment**, in SCP records and in SFTP listings alike.
   A malicious server could otherwise send `../../.bashrc` (CVE-2019-6111). On Windows clients `:` is refused as well, since it would
@@ -323,7 +324,9 @@ flowchart LR
   pr["PR with a changeset"] --> merge["merge to master"]
   merge --> cs["changesets/action<br/>opens 'chore: release' PR"]
   cs --> merge2["merge release PR"]
-  merge2 --> publish["scripts/publish.mjs<br/>npm publish with provenance<br/>(trusted publishing, no token)"]
+  merge2 --> publish["npm publish with provenance<br/>(trusted publishing, no token)"]
+  publish --> ghr["GitHub release vX.Y.Z<br/>notes from CHANGELOG.md"]
+  ghr --> major["move the v1 tag<br/>for the GitHub Action"]
 ```
 
 ## Decisions worth knowing

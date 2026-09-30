@@ -17,11 +17,20 @@ export function quotePosix(arg: string): string {
 }
 
 /**
- * Quotes one argument for the default Windows OpenSSH shell (cmd.exe). Characters that cmd.exe
- * would interpret even inside double quotes are rejected instead of escaped.
+ * Whether `arg` means the same inside double quotes to cmd.exe (the default Windows OpenSSH
+ * shell) and to PowerShell (a common `DefaultShell`). cmd.exe expands `%` and `!` and treats `^`
+ * specially even there; PowerShell expands `$` and escapes with a backtick.
+ */
+function isSafeForWindowsShell(arg: string): boolean {
+  return !/["%!^$`\0\r\n]/.test(arg);
+}
+
+/**
+ * Quotes one argument for a Windows OpenSSH shell. Characters that the shell would interpret
+ * even inside double quotes are rejected instead of escaped.
  */
 export function quoteWindows(arg: string): string {
-  if (/["%!^\0\r\n]/.test(arg)) {
+  if (!isSafeForWindowsShell(arg)) {
     throw new ScpError(
       ErrorCode.InvalidArgument,
       `Path ${JSON.stringify(arg)} contains characters that cannot be passed safely to a Windows shell`,

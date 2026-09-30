@@ -64,13 +64,54 @@ export class SftpTransport implements Transport {
   readonly protocol = 'sftp' as const;
   readonly #sftp: SFTPWrapper;
   readonly #paths: RemotePathApi;
+  readonly #lost: Promise<never>;
 
   constructor(sftp: SFTPWrapper, paths: RemotePathApi) {
     this.#sftp = sftp;
     this.#paths = paths;
+    this.#lost = new Promise<never>((_resolve, reject) => {
+      sftp.once('close', () =>
+        reject(
+          new ScpError(ErrorCode.ConnectionClosed, 'The connection closed during the transfer'),
+        ),
+      );
+    });
+    this.#lost.catch(() => undefined);
   }
 
-  async upload(
+  upload(localPath: string, remotePath: string, options: TransferOptions): Promise<TransferResult> {
+    return this.#unlessLost(this.#upload(localPath, remotePath, options));
+  }
+
+  download(
+    remotePath: string,
+    localPath: string,
+    options: TransferOptions,
+  ): Promise<TransferResult> {
+    return this.#unlessLost(this.#download(remotePath, localPath, options));
+  }
+
+  writeFile(
+    remotePath: string,
+    data: string | Uint8Array | Readable,
+    options: WriteFileOptions,
+  ): Promise<void> {
+    return this.#unlessLost(this.#writeFile(remotePath, data, options));
+  }
+
+  readFile(remotePath: string, options: ReadFileOptions): Promise<Buffer> {
+    return this.#unlessLost(this.#readFile(remotePath, options));
+  }
+
+  /**
+   * ssh2 never calls back some operations, fastPut and fastGet among them, when the connection
+   * drops in the middle: they wait for the reply to a close request sent on a dead channel.
+   */
+  #unlessLost<T>(operation: Promise<T>): Promise<T> {
+    return Promise.race([operation, this.#lost]);
+  }
+
+  async #upload(
     localPath: string,
     remotePath: string,
     options: TransferOptions,
@@ -128,7 +169,7 @@ export class SftpTransport implements Transport {
     return { files: sum.files, directories: sum.directories, bytes: sum.bytes };
   }
 
-  async download(
+  async #download(
     remotePath: string,
     localPath: string,
     options: TransferOptions,
@@ -220,7 +261,7 @@ export class SftpTransport implements Transport {
     return { files: files.length, directories: dirs.length, bytes };
   }
 
-  async writeFile(
+  async #writeFile(
     remotePath: string,
     data: string | Uint8Array | Readable,
     options: WriteFileOptions,
@@ -259,7 +300,7 @@ export class SftpTransport implements Transport {
     }
   }
 
-  async readFile(remotePath: string, options: ReadFileOptions): Promise<Buffer> {
+  async #readFile(remotePath: string, options: ReadFileOptions): Promise<Buffer> {
     throwIfAborted(options.signal);
     return withAbort(ops.readFile(this.#sftp, remotePath), options.signal);
   }

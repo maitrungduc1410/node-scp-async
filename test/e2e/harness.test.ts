@@ -11,6 +11,7 @@ import {
   symlink,
   writeFile,
 } from 'node:fs/promises';
+import { type AddressInfo, connect as connectTcp, createServer, type Server } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { ServerChannel } from 'ssh2';
@@ -251,6 +252,49 @@ describe.skipIf(!canRun)('harness specific behaviour', () => {
       const err = await c.download('big.bin', join(local, 'partial.bin')).catch((e: unknown) => e);
       expect(isScpError(err)).toBe(true);
     });
+  });
+
+  describe('lost connections', () => {
+    /** Forwards to the harness and cuts the TCP connection after `limit` bytes from the client. */
+    async function cuttingProxy(target: Harness, limit: number): Promise<Server> {
+      const proxy = createServer((socket) => {
+        const upstream = connectTcp(target.port, '127.0.0.1');
+        let received = 0;
+        socket.on('data', (chunk: Buffer) => {
+          received += chunk.length;
+          if (received > limit) {
+            socket.destroy();
+            upstream.destroy();
+          }
+        });
+        socket.pipe(upstream).pipe(socket);
+        socket.on('error', () => undefined);
+        upstream.on('error', () => undefined);
+      });
+      await new Promise<void>((resolve) => proxy.listen(0, '127.0.0.1', resolve));
+      return proxy;
+    }
+
+    for (const protocol of ['sftp', 'scp'] as const) {
+      it(`fails instead of hanging when the connection drops during an upload over ${protocol}`, async () => {
+        const target = await server();
+        const proxy = await cuttingProxy(target, 256 * 1024);
+        try {
+          const c = await connect({
+            ...target.connectOptions,
+            port: (proxy.address() as AddressInfo).port,
+            protocol,
+          });
+          const src = join(local, `drop-${protocol}.bin`);
+          await writeFile(src, randomBytes(4 * 1024 * 1024));
+          const err = await c.upload(src, join(root, `drop-${protocol}.bin`)).catch((e) => e);
+          expect(isScpError(err)).toBe(true);
+          await c.close();
+        } finally {
+          proxy.close();
+        }
+      });
+    }
   });
 
   describe('permissions and times', () => {
