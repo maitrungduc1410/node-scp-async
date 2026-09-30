@@ -1,6 +1,6 @@
 # Dropbear with scp and no SFTP server, the setup found on OpenWrt routers and many
 # embedded Linux devices.
-FROM alpine:3.22
+FROM alpine:3.24
 
 RUN apk add --no-cache dropbear dropbear-scp \
   && adduser -D -s /bin/sh test \
