@@ -1,3 +1,15 @@
+/**
+ * Copy files to and from SSH servers over SFTP or SCP.
+ *
+ * ```ts
+ * import { connect } from 'node-scp';
+ *
+ * await using client = await connect({ host: 'example.com', username: 'deploy', privateKey });
+ * await client.upload('./dist', '/var/www/app', { recursive: true });
+ * ```
+ *
+ * @module node-scp
+ */
 import { connect, ScpClient } from './client';
 import { ErrorCode, ScpError } from './errors';
 import { parseTarget, type RemoteTarget } from './target';

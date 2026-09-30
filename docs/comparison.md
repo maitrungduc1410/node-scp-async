@@ -42,8 +42,10 @@ each one is the better choice. Numbers were checked in September 2026.
 
 ## About the benchmark numbers
 
-node-scp's README shows a large lead for many small files. Most of it comes from one setting:
-node-scp turns on `TCP_NODELAY` for the SSH socket, and the others leave Nagle's algorithm on.
+node-scp shows a large lead for many small files:
+
+<BenchChart />
+Most of it comes from one setting: node-scp turns on `TCP_NODELAY` for the SSH socket, and the others leave Nagle's algorithm on.
 You can get much of the same improvement with the other libraries by calling `setNoDelay(true)`
 on their underlying ssh2 client. For single large files the libraries are close, since all of
 them use ssh2's pipelined `fastPut` / `fastGet` for SFTP.

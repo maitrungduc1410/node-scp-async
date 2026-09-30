@@ -25,11 +25,13 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Add missing final newlines
+        run: node scripts/final-newlines.mjs
       - run: pnpm lint
       - run: pnpm typecheck
       # npm publish silently rewrites or drops fields it considers invalid (it once dropped `bin`).
       - name: package.json needs no npm fixes
-        run: npm pkg fix && git diff --exit-code -- package.json
+        run: cp package.json "$RUNNER_TEMP/package.json" && npm pkg fix && diff -u "$RUNNER_TEMP/package.json" package.json
 
   test:
     name: Test on Node ${{ matrix.node }}

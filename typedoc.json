@@ -1,15 +1,23 @@
 {
-  "$schema": "https://typedoc.org/schema.json",
+  "$schema": "https://typedoc-plugin-markdown.org/schema.json",
   "name": "node-scp",
   "entryPoints": ["src/index.ts", "src/legacy/index.ts", "src/scp2/index.ts"],
   "out": "docs/api",
-  "readme": "README.md",
+  "plugin": ["typedoc-plugin-markdown", "typedoc-vitepress-theme"],
+  "docsRoot": "docs",
+  "readme": "none",
+  "entryFileName": "index",
   "excludePrivate": true,
   "excludeInternal": true,
-  "includeVersion": true,
+  "disableSources": true,
   "sort": ["kind", "instance-first", "alphabetical"],
-  "navigationLinks": {
-    "GitHub": "https://github.com/maitrungduc1410/node-scp-async",
-    "npm": "https://www.npmjs.com/package/node-scp"
-  }
+  "hidePageHeader": true,
+  "hideBreadcrumbs": true,
+  "useCodeBlocks": true,
+  "parametersFormat": "table",
+  "interfacePropertiesFormat": "table",
+  "classPropertiesFormat": "table",
+  "typeDeclarationFormat": "table",
+  "enumMembersFormat": "table",
+  "sidebar": { "autoConfiguration": true, "format": "vitepress", "pretty": true, "collapsed": true }
 }

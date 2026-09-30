@@ -7,7 +7,7 @@
  *
  * It always uses SFTP, like 0.x did. New code should use `connect` from `node-scp`.
  *
- * @module
+ * @module node-scp/legacy
  */
 import { EventEmitter } from 'node:events';
 import { resolve as resolveLocal } from 'node:path';

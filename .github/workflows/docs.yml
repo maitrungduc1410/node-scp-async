@@ -1,16 +1,18 @@
-name: API docs
+name: Docs
 
 on:
   push:
     branches: [master]
-    paths: ['src/**', 'typedoc.json', 'README.md', '.github/workflows/docs.yml']
+    paths: ['src/**', 'docs/**', 'typedoc.json', 'package.json', 'pnpm-lock.yaml', '.github/workflows/docs.yml']
+  pull_request:
+    paths: ['src/**', 'docs/**', 'typedoc.json', 'package.json', 'pnpm-lock.yaml', '.github/workflows/docs.yml']
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -18,19 +20,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          # VitePress reads the git history for "last updated" dates.
+          fetch-depth: 0
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm docs:api
-      - uses: actions/configure-pages@v6
-      - uses: actions/upload-pages-artifact@v5
+      - run: pnpm docs:build
+      - if: github.event_name != 'pull_request'
+        uses: actions/configure-pages@v6
+      - if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v5
         with:
-          path: docs/api
+          path: docs/.vitepress/dist
 
   deploy:
+    if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
     permissions:

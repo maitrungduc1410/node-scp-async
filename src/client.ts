@@ -33,6 +33,7 @@ export class ScpClient {
   readonly sftp: SFTPWrapper | undefined;
   /** The underlying ssh2 client, for advanced use such as running commands. */
   readonly ssh: SshClient;
+  /** Path flavour and quoting rules of the server, as passed to {@link connect}. */
   readonly remoteOs: RemoteOs;
 
   readonly #transport: Transport;
@@ -127,6 +128,7 @@ export class ScpClient {
     await this.#closedPromise;
   }
 
+  /** Closes the connection at the end of an `await using` block. */
   async [asyncDispose](): Promise<void> {
     await this.close();
   }

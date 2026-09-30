@@ -8,6 +8,12 @@ old ssh2. `node-scp/scp2` offers the same API on top of node-scp:
 + const client = require('node-scp/scp2');
 ```
 
+```mermaid
+flowchart LR
+  A["require('scp2')<br/>SFTP only, last release 2016"] -- "change one line" --> B["require('node-scp/scp2')<br/>same API, SFTP or SCP"]
+  B -. "optional, later" .-> C["connect() from 'node-scp'<br/>promises, progress, AbortSignal"]
+```
+
 ES modules work too:
 
 ```js
@@ -61,4 +67,32 @@ there as well.
 - Glob patterns support `*`, `?`, `**`, `[...]` and `{a,b}`. Names starting with a dot are not
   matched by wildcards, like the `glob` package scp2 used.
 - `client.sftp(cb)` fails with `ERR_SFTP_UNAVAILABLE` on servers without SFTP.
-- Errors are `ScpError` objects with a `code`, see the main README.
+- Errors are `ScpError` objects with a `code`, see [Handling errors](/guide/errors).
+
+## Going further: the new API
+
+The scp2 layer is complete, so there is no rush. When you touch the code anyway, the main API
+gives you progress for whole trees, filters, cancellation and typed errors:
+
+::: code-group
+
+```js [scp2]
+const { scp } = require('node-scp/scp2');
+
+scp('dist/', 'deploy:secret@example.com:/var/www/app/', (err) => {
+  if (err) console.error(err);
+});
+```
+
+```js [node-scp]
+const { upload } = require('node-scp');
+
+await upload('dist', 'deploy@example.com:/var/www/app', {
+  recursive: true,
+  password: process.env.DEPLOY_PASSWORD,
+});
+```
+
+:::
+
+See [Upload and download](/guide/transfers) for how destinations work in the main API.

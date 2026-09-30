@@ -3,6 +3,41 @@
 node-scp 1.0 has a new API. The old one is still shipped, so upgrading is two steps: first a one
 line change, then moving to the new API whenever it suits you.
 
+```mermaid
+flowchart LR
+  A["node-scp 0.x<br/>import from 'node-scp'"] -- "step 1: change the import<br/>(minutes)" --> B["node-scp 1.x<br/>'node-scp/legacy'"]
+  B -- "step 2: file by file<br/>(when it suits you)" --> C["node-scp 1.x<br/>connect() from 'node-scp'"]
+```
+
+The same task in each stage:
+
+::: code-group
+
+```ts [0.x]
+import { Client } from 'node-scp';
+
+const client = await Client({ host, username, privateKey });
+await client.uploadDir('./dist', '/var/www/app');
+client.close();
+```
+
+```ts [1.x, step 1: legacy]
+import { Client } from 'node-scp/legacy';
+
+const client = await Client({ host, username, privateKey });
+await client.uploadDir('./dist', '/var/www/app');
+await client.close();
+```
+
+```ts [1.x, step 2: new API]
+import { connect } from 'node-scp';
+
+await using client = await connect({ host, username, privateKey });
+await client.upload('./dist', '/var/www/app', { recursive: true });
+```
+
+:::
+
 ## Step 1: keep the old API
 
 ```diff

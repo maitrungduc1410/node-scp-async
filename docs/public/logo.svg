@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <title>node-scp</title>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2563eb" />
+      <stop offset="1" stop-color="#06b6d4" />
+    </linearGradient>
+  </defs>
+  <rect x="4" y="14" width="22" height="30" rx="4" stroke="url(#g)" stroke-width="4" />
+  <rect x="38" y="8" width="22" height="42" rx="4" stroke="url(#g)" stroke-width="4" />
+  <path d="M45 18h8M45 26h8" stroke="url(#g)" stroke-width="4" stroke-linecap="round" />
+  <path d="M8 54h48" stroke="url(#g)" stroke-width="4" stroke-linecap="round" />
+  <path d="M26 29h8m0 0-4-4m4 4-4 4" stroke="url(#g)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

@@ -3,6 +3,14 @@
 The repository is also a GitHub Action. It runs the node-scp CLI, so it works with SFTP servers
 and SCP only devices alike.
 
+```mermaid
+flowchart LR
+  A["git push"] --> B["checkout<br/>and build"]
+  B --> C["maitrungduc1410/node-scp-async@v1"]
+  S[("secrets<br/>key, fingerprint")] -.-> C
+  C -- "SFTP or SCP" --> D["your server"]
+```
+
 ```yaml
 name: Deploy
 on:

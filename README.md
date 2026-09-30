@@ -7,6 +7,9 @@
 
 Copy files to and from any SSH server from Node.js, over SFTP or SCP.
 
+**[Read the documentation](https://maitrungduc1410.github.io/node-scp-async/)**: guides with diagrams and live demos, recipes and the API
+reference.
+
 Most libraries only speak SFTP. node-scp also speaks the real SCP protocol, so the same code
 works on a cloud VM, a hardened SFTP only host, an OpenWrt router running Dropbear, or a switch
 that only has `scp`. It picks the protocol for you.
@@ -215,21 +218,22 @@ every option.
     exclude: '*.map'
 ```
 
-See [docs/recipes/github-actions.md](docs/recipes/github-actions.md) for every input.
+See [Deploying from GitHub Actions](https://maitrungduc1410.github.io/node-scp-async/recipes/github-actions) for every input.
 
 ## Upgrading
 
 - From node-scp 0.x: change the import to `node-scp/legacy` and everything keeps working, then
-  move to the new API at your pace. See [docs/migration/from-0.x.md](docs/migration/from-0.x.md).
+  move to the new API at your pace. See [Upgrading from node-scp 0.x](https://maitrungduc1410.github.io/node-scp-async/migration/from-0.x).
 - From `scp2`: replace `require('scp2')` with `require('node-scp/scp2')`. See
-  [docs/migration/from-scp2.md](docs/migration/from-scp2.md).
+  [Replacing scp2](https://maitrungduc1410.github.io/node-scp-async/migration/from-scp2).
 
 ## More reading
 
-- [SCP or SFTP in 2026?](docs/scp-vs-sftp.md) What changed with OpenSSH 9 and when each one wins.
-- [OpenWrt and Dropbear](docs/recipes/openwrt-dropbear.md), [network devices](docs/recipes/network-devices.md)
-- [How node-scp compares](docs/comparison.md) with ssh2-sftp-client and node-ssh
-- [Architecture](ARCHITECTURE.md) and the [API reference](https://maitrungduc1410.github.io/node-scp-async/)
+- [The guide](https://maitrungduc1410.github.io/node-scp-async/guide/): connecting, transfers, progress, the remote filesystem, errors
+- [SCP or SFTP in 2026?](https://maitrungduc1410.github.io/node-scp-async/scp-vs-sftp) What changed with OpenSSH 9 and when each one wins.
+- [Zero downtime deploys](https://maitrungduc1410.github.io/node-scp-async/recipes/atomic-deploy), [OpenWrt and Dropbear](https://maitrungduc1410.github.io/node-scp-async/recipes/openwrt-dropbear), [network devices](https://maitrungduc1410.github.io/node-scp-async/recipes/network-devices)
+- [How node-scp compares](https://maitrungduc1410.github.io/node-scp-async/comparison) with ssh2-sftp-client and node-ssh
+- [Architecture](ARCHITECTURE.md) and the [API reference](https://maitrungduc1410.github.io/node-scp-async/api/)
 
 ## Benchmarks
 
@@ -250,6 +254,7 @@ pnpm install
 pnpm test          # unit and end to end tests, needs sftp-server and scp installed locally
 pnpm test:docker   # real OpenSSH and Dropbear servers through testcontainers
 pnpm lint && pnpm typecheck
+pnpm docs:dev      # the documentation site on localhost
 ```
 
 [AGENTS.md](AGENTS.md) describes the workflow and conventions, [ARCHITECTURE.md](ARCHITECTURE.md)

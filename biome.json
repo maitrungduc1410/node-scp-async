@@ -2,7 +2,15 @@
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
   "files": {
-    "includes": ["**", "!dist", "!coverage", "!docs/api", "!**/*.md"]
+    "includes": [
+      "**",
+      "!dist",
+      "!coverage",
+      "!docs/api",
+      "!docs/.vitepress/cache",
+      "!docs/.vitepress/dist",
+      "!**/*.md"
+    ]
   },
   "formatter": {
     "enabled": true,
@@ -20,5 +28,15 @@
       "style": { "noNonNullAssertion": "off" },
       "suspicious": { "noControlCharactersInRegex": "off" }
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.vue"],
+      "linter": {
+        "rules": {
+          "correctness": { "noUnusedVariables": "off", "noUnusedImports": "off" }
+        }
+      }
+    }
+  ]
 }
