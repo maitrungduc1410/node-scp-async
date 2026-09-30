@@ -70,7 +70,7 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.cts",
   "bin": {
-    "node-scp": "./dist/cli.mjs"
+    "node-scp": "dist/cli.mjs"
   },
   "files": [
     "dist"
