@@ -1,3 +1,7 @@
+---
+description: "Replace the unmaintained scp2 package with node-scp/scp2 by changing one line: same API, SCP only servers supported, promises, and a path to the modern API."
+---
+
 # Replacing scp2
 
 [scp2](https://www.npmjs.com/package/scp2) has not been released since 2016 and depends on an

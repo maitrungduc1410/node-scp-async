@@ -1,3 +1,7 @@
+---
+description: "Write a string, Buffer or stream straight to a remote file and read remote files into memory with writeFile() and readFile(), over SFTP and SCP alike."
+---
+
 # Files in memory
 
 Not everything you send lives on disk. `writeFile()` and `readFile()` move data straight between

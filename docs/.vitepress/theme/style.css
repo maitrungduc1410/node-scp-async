@@ -48,3 +48,24 @@
 .home-section .vp-doc div[class*="language-"] {
   margin: 16px 0;
 }
+
+/* VPNavBar sets white-space: nowrap; long site titles must wrap inside the title area instead of overflowing. */
+.VPNavBar .container > .title {
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+.VPNavBarTitle .title {
+  min-width: 0;
+}
+
+.VPNavBarTitle .title > span {
+  min-width: 0;
+  white-space: normal;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.VPNavBarTitle .logo {
+  flex-shrink: 0;
+}

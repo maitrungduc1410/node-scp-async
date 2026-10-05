@@ -1,4 +1,5 @@
 ---
+description: "Copy files to and from any SSH server from Node.js: SFTP when the server has it, the real SCP protocol when it does not. Library, CLI and GitHub Action."
 layout: home
 
 hero:

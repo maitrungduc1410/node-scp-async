@@ -4,27 +4,38 @@ import type { RemotePathApi } from '../remote-path';
 import type { EntryType } from '../types';
 import * as ops from './ops';
 
+/** Details of a remote entry, as returned by {@link RemoteFs.stat}. */
 export interface RemoteStats {
   type: EntryType;
+  /** Size in bytes. */
   size: number;
   /** Permission bits, for example `0o755`. */
   mode: number;
+  /** Numeric user id of the owner. */
   uid: number;
+  /** Numeric group id. */
   gid: number;
+  /** Last access time. */
   atime: Date;
+  /** Last modification time. */
   mtime: Date;
 }
 
+/** One entry of {@link RemoteFs.list}. Symlinks are described themselves, not their targets. */
 export interface RemoteEntry extends RemoteStats {
+  /** File name inside the listed directory. */
   name: string;
 }
 
+/** Options for {@link RemoteFs.mkdir}. */
 export interface MkdirOptions {
   /** Create missing parents and succeed if the directory already exists, like `mkdir -p`. */
   recursive?: boolean;
+  /** Permissions for the new directories, reduced by the server's umask. */
   mode?: number;
 }
 
+/** Options for {@link RemoteFs.rm}. */
 export interface RmOptions {
   /** Remove directories and their contents. */
   recursive?: boolean;
@@ -58,7 +69,10 @@ export class RemoteFs {
     this.#paths = paths;
   }
 
-  /** Returns the entry type, or `false` when nothing exists at `path`. Other errors throw. */
+  /**
+   * Returns the entry type, or `false` when nothing exists at `path`. Symlinks are followed, so
+   * `'symlink'` means a link whose target is missing. Other errors throw.
+   */
   async exists(path: string): Promise<EntryType | false> {
     try {
       return (await this.stat(path)).type;
@@ -93,6 +107,7 @@ export class RemoteFs {
       .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
   }
 
+  /** Creates a directory. With `recursive`, creates missing parents too, like `mkdir -p`. */
   async mkdir(path: string, options: MkdirOptions = {}): Promise<void> {
     const attrs = options.mode === undefined ? {} : { mode: options.mode };
     if (!options.recursive) {
@@ -124,6 +139,7 @@ export class RemoteFs {
     }
   }
 
+  /** Deletes a file or symlink, or with `recursive` a directory and everything in it. */
   async rm(path: string, options: RmOptions = {}): Promise<void> {
     let st: RemoteStats;
     try {
@@ -149,6 +165,7 @@ export class RemoteFs {
     await ops.rmdir(this.#sftp, path);
   }
 
+  /** Moves or renames `from` to `to`. */
   async rename(from: string, to: string): Promise<void> {
     await ops.rename(this.#sftp, from, to);
   }

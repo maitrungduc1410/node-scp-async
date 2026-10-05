@@ -21,11 +21,15 @@ import { mkdirp, remoteIsDirectory } from '../remote-helpers';
 import { remotePath } from '../remote-path';
 import type { ConnectOptions } from '../types';
 
+/** Connection options in the `scp2` style: node-scp's connect options plus a remote `path`. */
 export interface Scp2Options extends Omit<ConnectOptions, 'port' | 'beforeConnect' | 'signal'> {
+  /** SSH port, as a number or a string. */
   port?: number | string;
+  /** Remote path the operation works on. */
   path?: string;
 }
 
+/** What {@link write} sends: `content` written to the remote `destination`. */
 export interface Scp2WriteOptions {
   destination: string;
   content: string | Buffer;
@@ -33,6 +37,7 @@ export interface Scp2WriteOptions {
   source?: string;
 }
 
+/** Node style callback of the `scp2` API, called with an error or with `null` on success. */
 export type Scp2Callback = (err?: Error | null) => void;
 
 const SCP2_REMOTE = /^([a-zA-Z0-9\-._]+)(:.*)?@([^:]+)(:\d+)?:(.*)$/;
@@ -49,7 +54,7 @@ function finish<T>(
   return undefined;
 }
 
-/** The `scp2` `Client` class. */
+/** Drop in for the `Client` class of `scp2`, with the same constructor, events and methods. */
 export class Client extends EventEmitter {
   remote: Scp2Options = {};
   #defaults: Scp2Options;
@@ -312,18 +317,25 @@ const shared = new Client();
 
 /** Sets defaults on the shared client, like `require('scp2').defaults(...)`. */
 export const defaults = (options: Scp2Options) => shared.defaults(options);
+/** Uploads a local file or directory with the shared client. */
 export const upload = (src: string, dest: string, callback?: Scp2Callback) =>
   shared.upload(src, dest, callback);
+/** Downloads a remote file or directory with the shared client. */
 export const download = (src: string, dest: string, callback?: Scp2Callback) =>
   shared.download(src, dest, callback);
+/** Creates a remote directory and its parents with the shared client. */
 export const mkdir = (
   dir: string,
   attrs?: { mode?: number } | Scp2Callback,
   callback?: Scp2Callback,
 ) => shared.mkdir(dir, attrs, callback);
+/** Writes `content` to a remote file with the shared client. */
 export const write = (options: Scp2WriteOptions, callback?: Scp2Callback) =>
   shared.write(options, callback);
+/** Parses a remote location for the shared client, like `require('scp2').parse(...)`. */
 export const parse = (remote: string | Scp2Options) => shared.parse(remote);
+/** Closes the connection of the shared client. */
 export const close = () => shared.close();
 
+/** The shared default client of `require('scp2')`, with `scp` and `Client` attached. */
 export default Object.assign(shared, { scp, Client });

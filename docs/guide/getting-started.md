@@ -1,3 +1,7 @@
+---
+description: "Install node-scp, connect with a private key, agent or password, upload a folder and download a file, then close the connection safely with await using."
+---
+
 # Getting started
 
 This page takes you from an empty project to your first upload in a few minutes.

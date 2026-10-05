@@ -1,3 +1,7 @@
+---
+description: "Deploy from GitHub Actions to any SSH server, SFTP or SCP only, with the node-scp action: every input, where files end up and how to pin the host key."
+---
+
 # Deploying from GitHub Actions
 
 The repository is also a GitHub Action. It runs the node-scp CLI, so it works with SFTP servers

@@ -1,3 +1,7 @@
+---
+description: "Zero downtime deploys with node-scp: upload each release to its own folder, switch a current symlink atomically, keep the newest five and roll back in one step."
+---
+
 # Zero downtime deploys
 
 Uploading straight into the folder your web server reads from leaves a window where visitors see

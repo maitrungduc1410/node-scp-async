@@ -1,7 +1,11 @@
+---
+description: "Track node-scp transfers with onProgress and cancel them with AbortSignal, including timeouts, with a live demo of what your callback receives."
+---
+
 # Progress and cancelling
 
-Every transfer method takes an `onProgress` callback and an `AbortSignal`. Press **Start** below
-to watch what your callback receives, then try `controller.abort()` halfway through.
+`upload()` and `download()` take an `onProgress` callback and an `AbortSignal`. Press **Start**
+below to watch what your callback receives, then try `controller.abort()` halfway through.
 
 <ProgressDemo />
 

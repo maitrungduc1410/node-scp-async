@@ -1,3 +1,7 @@
+---
+description: "Handle node-scp errors with stable codes that mean the same over SFTP and SCP: every ErrorCode, its cause, what to do, and a retry pattern for flaky networks."
+---
+
 # Handling errors
 
 Everything node-scp throws is a `ScpError` with three things you can rely on:
@@ -52,8 +56,8 @@ flowchart LR
 | `ERR_ABORTED` | Your `signal` fired. | Usually expected; see [cancelling](./progress#cancel-a-transfer). |
 | `ERR_CONNECTION_CLOSED` | The connection dropped during an operation. | Reconnect and retry. |
 | `ERR_NOT_CONNECTED` | The client was already closed. | Create a new client. |
-| `ERR_INVALID_ARGUMENT` | An option or path is invalid. | The message says which. |
-| `ERR_UNSUPPORTED` | The operation is not possible over this protocol or server. | |
+| `ERR_INVALID_ARGUMENT` | An option or path is invalid, or a stream does not match its declared `size`. | The message says which. |
+| `ERR_UNSUPPORTED` | The SFTP server does not support the operation. | |
 | `ERR_REMOTE`, `ERR_LOCAL` | Any other failure on the server or on your machine. | Look at `err.cause`. |
 
 ## Retry when the network is flaky

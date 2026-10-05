@@ -1,3 +1,7 @@
+---
+description: "What node-scp is: one SSH connection, SFTP or SCP picked for you, plus recursive copies, progress, cancellation, typed errors, a CLI and a GitHub Action."
+---
+
 # What is node-scp?
 
 node-scp copies files between your Node.js program and any machine you can reach over SSH. It

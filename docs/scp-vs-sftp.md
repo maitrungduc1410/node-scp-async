@@ -1,3 +1,7 @@
+---
+description: "SCP or SFTP in 2026: how both protocols work, what OpenSSH 8 and 9 changed, where SCP is still the only option, and how node-scp handles both safely."
+---
+
 # SCP or SFTP in 2026?
 
 Both run over SSH, both copy files, and since OpenSSH 9 even the `scp` command usually speaks
@@ -51,7 +55,7 @@ refuses to run `scp`.
 | Listing, rename, delete, chmod | Yes | No, only copying |
 | Resume, random access | Yes | No |
 | Remote shell involved | No | Yes, the path goes through the remote shell |
-| Security history | Clean protocol | Protocol has no framing for errors in names; clients must validate everything |
+| Trust in the server | The client requests each path itself; names from listings still need a check | The server decides what it sends, so the client must check every record |
 
 ## What node-scp does about it
 

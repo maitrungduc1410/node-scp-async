@@ -1,3 +1,7 @@
+---
+description: "Copy firmware and configuration files to routers, switches and appliances that only offer SCP, with tips on vendor quirks, legacy algorithms and common errors."
+---
+
 # Routers, switches and appliances
 
 Many network devices accept SSH logins but implement only a small SCP server for moving

@@ -1,3 +1,7 @@
+---
+description: "Upgrade from node-scp 0.x in two steps: change one import to node-scp/legacy, then move to connect() file by file, with a full method mapping."
+---
+
 # Upgrading from node-scp 0.x
 
 node-scp 1.0 has a new API. The old one is still shipped, so upgrading is two steps: first a one

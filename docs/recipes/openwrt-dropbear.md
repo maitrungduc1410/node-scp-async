@@ -1,3 +1,7 @@
+---
+description: "Use node-scp with OpenWrt routers and Dropbear, which have no SFTP: back up /etc/config, push config files, upload a sysupgrade image and avoid common pitfalls."
+---
+
 # OpenWrt and Dropbear
 
 OpenWrt routers run Dropbear as their SSH server. Dropbear can run `scp`, but it has no SFTP
@@ -54,9 +58,9 @@ await router.upload('./openwrt-sysupgrade.bin', '/tmp/sysupgrade.bin', {
 
 ## Tips
 
-- **Remote parents must exist.** Without SFTP there is no way to create directories as part of
-  the copy. Upload into directories that exist, or run `mkdir -p` first through
-  `router.ssh.exec`.
+- **Remote parents must exist.** A recursive upload creates the folders inside what you copy,
+  but over SCP node-scp cannot create missing parents of the destination. Upload into
+  directories that exist, or run `mkdir -p` first through `router.ssh.exec`.
 - **Skip the SFTP probe** with `protocol: 'scp'` when you know the device. It saves one round
   trip and avoids a log line on the router.
 - **Keys instead of passwords.** Put your public key in `/etc/dropbear/authorized_keys` on the

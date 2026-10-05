@@ -37,6 +37,7 @@ import { ErrorCode, isScpError, ScpError } from '../errors';
 import { remotePath as remotePathApi } from '../remote-path';
 import { typeFromMode } from '../sftp/ops';
 
+/** Listeners for ssh2 client events, passed as `events` in {@link TScpOptions}. */
 export interface ClientEvents {
   banner?: (message: string) => void;
   ready?: () => void;
@@ -73,8 +74,11 @@ export interface ClientEvents {
   ) => void;
 }
 
+/** Options of the 0.x {@link Client}: every ssh2 connect option plus the two below. */
 export type TScpOptions = ConnectConfig & {
+  /** `win32` for Windows OpenSSH servers. Defaults to `posix`. */
   remoteOsType?: 'posix' | 'win32';
+  /** Event listeners attached to the ssh2 client before it connects. */
   events?: ClientEvents;
 };
 
@@ -124,7 +128,11 @@ function listType(mode: number | undefined, longname: string): string {
 
 type Callback<T> = (err: Error | null | undefined, value: T) => void;
 
-/** @deprecated Use `connect` from `node-scp`. */
+/**
+ * The 0.x client returned by {@link Client}, with the same methods and events as before.
+ *
+ * @deprecated Use `connect` from `node-scp`.
+ */
 export class ScpClient extends EventEmitter {
   sftpWrapper: SFTPWrapper | null = null;
   sshClient: SshClient | null = null;

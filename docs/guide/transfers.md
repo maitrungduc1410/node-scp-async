@@ -1,3 +1,7 @@
+---
+description: "Upload and download files and folders with node-scp: exact destinations, filters, permissions and times, parallel SFTP copies and the one call helpers."
+---
+
 # Upload and download
 
 Two methods move files, and they mirror each other:
@@ -58,7 +62,8 @@ await client.upload('./project', '/srv/project', {
 ```
 
 - `path` is relative to what you copy and always uses `/`, for example `src/index.ts`.
-- `entry` has `type` (`'file'`, `'directory'`, `'symlink'`, `'other'`), `size` and `mode`.
+- `entry` has `type`, `size` and `mode`. Symlinks are followed and entries that are neither files
+  nor directories (sockets, devices) are skipped, so `type` is always `'file'` or `'directory'`.
 
 ## Permissions and times
 
@@ -105,7 +110,8 @@ The options object takes connection options and transfer options together. Accep
 | `{ host, port, username, path }` | an object, when you already have the parts |
 
 [`parseTarget()` and `formatTarget()`](/api/node-scp/functions/parseTarget) convert between the
-two forms if you build your own tooling.
+string and the object form if you build your own tooling. The `user@host:path` form has no place
+for a port, so `formatTarget()` leaves it out.
 
 ## Next
 

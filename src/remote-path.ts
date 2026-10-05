@@ -1,5 +1,6 @@
 import { posix, win32 } from 'node:path';
 
+/** Path and quoting style of the server: `posix`, or `win32` for Windows OpenSSH. */
 export type RemoteOs = 'posix' | 'win32';
 
 export interface RemotePathApi {

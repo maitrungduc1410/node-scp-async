@@ -1,8 +1,12 @@
 import { ErrorCode, ScpError } from './errors';
 
+/** A remote location split into its parts, as returned by {@link parseTarget}. */
 export interface RemoteTarget {
+  /** Host name or IP address, without brackets for IPv6. */
   host: string;
+  /** SSH port, when the location names one. */
   port?: number;
+  /** User name, when the location names one. */
   username?: string;
   /** Path on the server. Empty means the login directory. */
   path: string;
@@ -69,6 +73,10 @@ function parseUri(value: string): RemoteTarget {
   return target;
 }
 
+/**
+ * Formats a {@link RemoteTarget} as `user@host:path`, with brackets around IPv6 addresses. This
+ * form has no place for a port, so `port` is left out.
+ */
 export function formatTarget(target: RemoteTarget): string {
   const host = target.host.includes(':') ? `[${target.host}]` : target.host;
   const user = target.username ? `${target.username}@` : '';

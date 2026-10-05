@@ -1,8 +1,24 @@
 <script setup lang="ts">
+import { useLocale } from '../i18n';
+
+const t = useLocale({
+  en: {
+    small: '200 files of 4 KiB in 10 directories',
+    large: 'One 16 MiB file',
+    lower: 'lower is better',
+  },
+  vi: {
+    small: '200 tệp 4 KiB trong 10 thư mục',
+    large: 'Một tệp 16 MiB',
+    lower: 'càng thấp càng tốt',
+  },
+  zh: { small: '10 个目录中的 200 个 4 KiB 文件', large: '单个 16 MiB 文件', lower: '越低越好' },
+});
+
 // Mean upload times from bench/transfer.bench.ts, OpenSSH on the same machine, Node 22.
-const groups = [
+const groups: { key: 'small' | 'large'; rows: { name: string; ms: number; ours?: boolean }[] }[] = [
   {
-    title: '200 files of 4 KiB in 10 directories',
+    key: 'small',
     rows: [
       { name: 'node-scp (SFTP)', ms: 52, ours: true },
       { name: 'node-scp (SCP)', ms: 67, ours: true },
@@ -11,7 +27,7 @@ const groups = [
     ],
   },
   {
-    title: 'One 16 MiB file',
+    key: 'large',
     rows: [
       { name: 'node-scp (SCP)', ms: 53, ours: true },
       { name: 'node-scp (SFTP)', ms: 57, ours: true },
@@ -24,8 +40,8 @@ const groups = [
 
 <template>
   <div class="bench">
-    <div v-for="group in groups" :key="group.title" class="group">
-      <div class="title">{{ group.title }} <span>(lower is better)</span></div>
+    <div v-for="group in groups" :key="group.key" class="group">
+      <div class="title">{{ t[group.key] }} <span>({{ t.lower }})</span></div>
       <div v-for="row in group.rows" :key="row.name" class="row">
         <span class="name">{{ row.name }}</span>
         <div class="track">

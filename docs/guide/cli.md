@@ -1,3 +1,7 @@
+---
+description: "The node-scp command line: scp style copies with npx, where files end up, credentials from the environment, host key pinning and every option explained."
+---
+
 # Command line
 
 `node-scp` works like `scp`, with SFTP or SCP chosen for you. There is nothing to install
@@ -41,15 +45,19 @@ with `/`, sources are copied **into** it.
 
 ## Logging in
 
-The CLI offers the server these credentials, in this order:
+The CLI collects credentials from these places:
 
-```mermaid
-flowchart LR
-  A["NODE_SCP_PRIVATE_KEY<br/>key contents"] --> B["-i file<br/>(NODE_SCP_PASSPHRASE)"]
-  B --> C["NODE_SCP_PASSWORD"]
-  C --> D["ssh-agent<br/>SSH_AUTH_SOCK"]
-  D --> E["~/.ssh/id_ed25519<br/>id_ecdsa, id_rsa"]
-```
+| Source | Used as |
+| --- | --- |
+| `NODE_SCP_PRIVATE_KEY` | Private key contents. Takes precedence over `-i`. |
+| `-i <file>` | Private key file. |
+| `NODE_SCP_PASSPHRASE` | Passphrase for an encrypted private key. |
+| `NODE_SCP_PASSWORD` | Password. |
+| `SSH_AUTH_SOCK` | The running ssh-agent. |
+| `~/.ssh/id_ed25519`, `id_ecdsa`, `id_rsa` | Only when none of the above is set: the first of these files that exists. |
+
+Everything it finds is offered to the server. ssh2 tries the password first, then the private
+key, then the agent.
 
 Passwords are never accepted as arguments, since those end up in shell history and process
 lists. Use the environment:

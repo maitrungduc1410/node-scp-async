@@ -1,3 +1,7 @@
+---
+description: "node-scp compared with ssh2-sftp-client, node-ssh and scp2: protocols, features, TypeScript support and benchmarks, and when each library is the better choice."
+---
+
 # How node-scp compares
 
 There are good SSH file transfer libraries for Node.js. This page tries to be fair about when
@@ -45,10 +49,12 @@ each one is the better choice. Numbers were checked in September 2026.
 node-scp shows a large lead for many small files:
 
 <BenchChart />
-Most of it comes from one setting: node-scp turns on `TCP_NODELAY` for the SSH socket, and the others leave Nagle's algorithm on.
-You can get much of the same improvement with the other libraries by calling `setNoDelay(true)`
-on their underlying ssh2 client. For single large files the libraries are close, since all of
-them use ssh2's pipelined `fastPut` / `fastGet` for SFTP.
 
-Benchmarks are in `bench/transfer.bench.ts`. Run them against your own server with
-`NODE_SCP_BENCH_HOST` and friends before drawing conclusions for your setup.
+Most of it comes from one setting: node-scp turns on `TCP_NODELAY` for the SSH socket, while
+the others leave Nagle's algorithm on. You can get much of the same improvement with the other
+libraries by calling `setNoDelay(true)` on their underlying ssh2 client. For single large files
+the libraries are close, since all of them use ssh2's pipelined `fastPut` / `fastGet` for SFTP.
+
+The benchmarks are in `bench/transfer.bench.ts`. Before drawing conclusions for your setup, run
+them against your own server by setting `NODE_SCP_BENCH_HOST`, `NODE_SCP_BENCH_PORT`,
+`NODE_SCP_BENCH_USER` and `NODE_SCP_BENCH_PASSWORD`.

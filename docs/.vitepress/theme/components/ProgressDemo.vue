@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, reactive, ref } from 'vue';
+import { useLocale } from '../i18n';
 
 interface File {
   path: string;
@@ -15,6 +16,59 @@ const SOURCE = [
   { path: 'docs/manual.pdf', size: 1_300_000 },
   { path: 'favicon.ico', size: 15_000 },
 ];
+const t = useLocale({
+  en: {
+    connected: 'connected over {protocol}',
+    notCalled: 'not called yet',
+    start: 'Start',
+    again: 'Run again',
+    of: 'of',
+    files: 'files',
+    last: 'Last',
+    call: 'call',
+    soFar: '{n} so far',
+    sftp: 'SFTP copies up to {concurrency} files at once (4 by default).',
+    scp: 'SCP streams one file at a time over a single channel.',
+    unknown:
+      ' An SCP download learns about each file only when the server sends it, so {total} and {filesTotal} are {undefined}.',
+  },
+  vi: {
+    connected: 'đã kết nối qua {protocol}',
+    notCalled: 'chưa được gọi',
+    start: 'Bắt đầu',
+    again: 'Chạy lại',
+    of: '/',
+    files: 'tệp',
+    last: 'Lần gọi',
+    call: 'gần nhất',
+    soFar: '{n} lần đến giờ',
+    sftp: 'SFTP sao chép tối đa {concurrency} tệp cùng lúc (mặc định là 4).',
+    scp: 'SCP truyền từng tệp một qua một channel duy nhất.',
+    unknown:
+      ' Khi tải xuống qua SCP, node-scp chỉ biết về từng tệp lúc máy chủ gửi nó tới, nên {total} và {filesTotal} là {undefined}.',
+  },
+  zh: {
+    connected: '已通过 {protocol} 连接',
+    notCalled: '尚未调用',
+    start: '开始',
+    again: '再运行一次',
+    of: '/',
+    files: '个文件',
+    last: '最近一次',
+    call: '调用',
+    soFar: '累计 {n} 次',
+    sftp: 'SFTP 最多同时复制 {concurrency} 个文件（默认 4 个）。',
+    scp: 'SCP 在单个通道上逐个传输文件。',
+    unknown:
+      '通过 SCP 下载时，只有服务器发来某个文件时才知道它的存在，因此 {total} 和 {filesTotal} 为 {undefined}。',
+  },
+});
+
+/** Splits a message around `{name}` placeholders, which the template renders as code. */
+function parts(message: string): { text: string; code: boolean }[] {
+  return message.split(/\{(\w+)\}/).map((text, i) => ({ text, code: i % 2 === 1 }));
+}
+
 const BYTES_PER_SECOND = 900_000;
 const TICK_MS = 50;
 
@@ -90,11 +144,12 @@ const code = computed(() => {
     direction.value === 'upload'
       ? "client.upload('./site', '/srv/site', {"
       : "client.download('/srv/site', './site', {";
-  return `// connected over ${protocol.value.toUpperCase()}\nconst result = await ${call}\n  recursive: true,\n  onProgress: (p) => render(p),\n  signal: controller.signal,\n});`;
+  const via = t.value.connected.replace('{protocol}', protocol.value.toUpperCase());
+  return `// ${via}\nconst result = await ${call}\n  recursive: true,\n  onProgress: (p) => render(p),\n  signal: controller.signal,\n});`;
 });
 
 const shown = computed(() => {
-  if (!last.value) return '// not called yet';
+  if (!last.value) return `// ${t.value.notCalled}`;
   const lines = Object.entries(last.value).map(
     ([key, value]) => `  ${key}: ${typeof value === 'string' ? `'${value}'` : String(value)},`,
   );
@@ -133,7 +188,7 @@ onBeforeUnmount(stop);
       </div>
       <span class="spacer" />
       <button class="action" :disabled="status === 'running'" @click="start">
-        {{ status === 'idle' ? 'Start' : 'Run again' }}
+        {{ status === 'idle' ? t.start : t.again }}
       </button>
       <button class="action danger" :disabled="status !== 'running'" @click="abort">controller.abort()</button>
     </div>
@@ -143,8 +198,8 @@ onBeforeUnmount(stop);
     <div class="overall">
       <div class="bar"><div class="fill" :style="{ width: `${(transferred / totalBytes) * 100}%` }" /></div>
       <span>
-        {{ kb(transferred) }}<template v-if="totalsKnown"> of {{ kb(totalBytes) }} ({{ percent }}%)</template>,
-        {{ completed }}<template v-if="totalsKnown"> of {{ files.length }}</template> files
+        {{ kb(transferred) }}<template v-if="totalsKnown"> {{ t.of }} {{ kb(totalBytes) }} ({{ percent }}%)</template>,
+        {{ completed }}<template v-if="totalsKnown"> {{ t.of }} {{ files.length }}</template> {{ t.files }}
       </span>
     </div>
 
@@ -156,17 +211,17 @@ onBeforeUnmount(stop);
         </div>
       </div>
       <div class="event">
-        <div class="title">Last <code>onProgress</code> call <span class="count">({{ calls }} so far)</span></div>
+        <div class="title">{{ t.last }} <code>onProgress</code> {{ t.call }} <span class="count">({{ t.soFar.replace('{n}', String(calls)) }})</span></div>
         <pre>{{ shown }}</pre>
       </div>
     </div>
 
     <p v-if="outcome" class="outcome" :class="status">{{ outcome }}</p>
     <p class="note">
-      <template v-if="protocol === 'sftp'">SFTP copies up to <code>concurrency</code> files at once (4 by default).</template>
-      <template v-else>SCP streams one file at a time over a single channel.</template>
-      <template v-if="!totalsKnown"> An SCP download learns about each file only when the server sends it, so
-        <code>total</code> and <code>filesTotal</code> are <code>undefined</code>.</template>
+      <template v-for="(part, i) in parts(protocol === 'sftp' ? t.sftp : t.scp)" :key="`a${i}`"><code v-if="part.code">{{ part.text }}</code><template v-else>{{ part.text }}</template></template>
+      <template v-if="!totalsKnown">
+        <template v-for="(part, i) in parts(t.unknown)" :key="`b${i}`"><code v-if="part.code">{{ part.text }}</code><template v-else>{{ part.text }}</template></template>
+      </template>
     </p>
   </div>
 </template>

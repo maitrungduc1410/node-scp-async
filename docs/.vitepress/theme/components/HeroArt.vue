@@ -1,5 +1,15 @@
+<script setup lang="ts">
+import { useLocale } from '../i18n';
+
+const label = useLocale({
+  en: 'Files moving from a laptop to a server over SFTP and SCP',
+  vi: 'Các tệp được chuyển từ laptop lên máy chủ qua SFTP và SCP',
+  zh: '文件通过 SFTP 和 SCP 从笔记本电脑传到服务器',
+});
+</script>
+
 <template>
-  <svg class="hero-art" viewBox="0 0 400 300" role="img" aria-label="Files moving from a laptop to a server over SFTP and SCP">
+  <svg class="hero-art" viewBox="0 0 400 300" role="img" :aria-label="label">
     <!-- laptop -->
     <rect class="card" x="20" y="84" width="140" height="96" rx="12" />
     <rect class="accent" x="38" y="104" width="56" height="8" rx="4" />

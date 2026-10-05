@@ -1,3 +1,7 @@
+---
+description: "Connect with node-scp: private keys, ssh-agent, passwords and keyboard interactive logins, host key pinning, timeouts, jump hosts and closing the connection."
+---
+
 # Connecting
 
 `connect()` gives you a ready client. Behind that one call, a few things happen in order:

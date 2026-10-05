@@ -22,17 +22,26 @@ export const ErrorCode = {
   Aborted: 'ERR_ABORTED',
 } as const;
 
+/** One of the string values of {@link ErrorCode}, for example `'ERR_NOT_FOUND'`. */
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 
+/** Options for the {@link ScpError} constructor. */
 export interface ScpErrorOptions {
+  /** The underlying error from ssh2, the server or the local filesystem. */
   cause?: unknown;
   /** The local or remote path the failing operation was working on. */
   path?: string;
 }
 
+/**
+ * The error type of every failure that leaves node-scp. Branch on {@link ScpError.code}, which
+ * means the same over SFTP and SCP; the original error is kept as `cause`.
+ */
 export class ScpError extends Error {
   override readonly name = 'ScpError';
+  /** Stable code describing what went wrong. */
   readonly code: ErrorCode;
+  /** The local or remote path involved, when there is one. */
   readonly path: string | undefined;
 
   constructor(code: ErrorCode, message: string, options: ScpErrorOptions = {}) {
@@ -42,6 +51,15 @@ export class ScpError extends Error {
   }
 }
 
+/**
+ * Whether `value` is a {@link ScpError}, optionally with a specific `code`. Narrows the type in
+ * TypeScript.
+ *
+ * @example
+ * ```ts
+ * if (isScpError(err, ErrorCode.NotFound)) console.log(`missing: ${err.path}`);
+ * ```
+ */
 export function isScpError(value: unknown, code?: ErrorCode): value is ScpError {
   return value instanceof ScpError && (code === undefined || value.code === code);
 }

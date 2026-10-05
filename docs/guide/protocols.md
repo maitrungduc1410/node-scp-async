@@ -1,3 +1,7 @@
+---
+description: "How node-scp picks between SFTP and SCP with protocol: 'auto', what each protocol supports, and when to force 'sftp' or 'scp' for your server."
+---
+
 # Choosing the protocol
 
 Short answer: you usually do not have to. The default, `protocol: 'auto'`, asks the server for

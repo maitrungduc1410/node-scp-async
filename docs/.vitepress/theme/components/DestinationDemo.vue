@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useLocale } from '../i18n';
 
 type State = 'new' | 'replaced' | 'kept';
 interface Row {
@@ -10,6 +11,63 @@ interface Row {
 }
 
 const props = withDefaults(defineProps<{ initial?: 'library' | 'cli' }>(), { initial: 'library' });
+
+const t = useLocale({
+  en: {
+    tool: 'Tool',
+    cli: 'CLI and GitHub Action',
+    exists: '/var/www/app already exists',
+    slash: 'trailing slash on the target',
+    local: 'Your machine',
+    before: 'Server before',
+    after: 'Server after',
+    missing: 'Fails: /var/www/app does not exist.',
+    missingNote:
+      'A trailing slash means "into this directory", so the directory has to exist already.',
+    into: 'Like scp: the target is an existing directory, so dist is copied into it.',
+    merge:
+      'The destination is exact. /var/www/app gets the contents of dist; files with the same name are replaced and other files stay.',
+    exact:
+      'The destination is exact. /var/www/app becomes a copy of dist. Its parent, /var/www, must exist.',
+    cliCopy: 'Like scp: the target does not exist, so it becomes a copy of dist.',
+    states: { new: 'new', replaced: 'replaced', kept: 'untouched' },
+  },
+  vi: {
+    tool: 'Công cụ',
+    cli: 'CLI và GitHub Action',
+    exists: '/var/www/app đã tồn tại',
+    slash: 'thêm dấu / ở cuối đích',
+    local: 'Máy của bạn',
+    before: 'Máy chủ trước khi sao chép',
+    after: 'Máy chủ sau khi sao chép',
+    missing: 'Lỗi: /var/www/app không tồn tại.',
+    missingNote:
+      'Dấu / ở cuối nghĩa là "sao chép vào trong thư mục này", nên thư mục đó phải có sẵn.',
+    into: 'Giống scp: đích là một thư mục đã có, nên dist được sao chép vào bên trong nó.',
+    merge:
+      'Đích là đường dẫn chính xác. /var/www/app nhận nội dung của dist; tệp trùng tên bị ghi đè, các tệp khác vẫn giữ nguyên.',
+    exact:
+      'Đích là đường dẫn chính xác. /var/www/app trở thành bản sao của dist. Thư mục cha /var/www phải có sẵn.',
+    cliCopy: 'Giống scp: đích chưa tồn tại, nên nó trở thành bản sao của dist.',
+    states: { new: 'mới', replaced: 'ghi đè', kept: 'giữ nguyên' },
+  },
+  zh: {
+    tool: '工具',
+    cli: '命令行与 GitHub Action',
+    exists: '/var/www/app 已存在',
+    slash: '目标以 / 结尾',
+    local: '本机',
+    before: '复制前的服务器',
+    after: '复制后的服务器',
+    missing: '失败：/var/www/app 不存在。',
+    missingNote: '结尾的 / 表示“复制到这个目录里”，所以该目录必须已经存在。',
+    into: '与 scp 相同：目标是已存在的目录，所以 dist 会被复制到它里面。',
+    merge: '目标路径是精确的。/var/www/app 获得 dist 的内容；同名文件被替换，其他文件保留。',
+    exact: '目标路径是精确的。/var/www/app 成为 dist 的副本，其父目录 /var/www 必须已存在。',
+    cliCopy: '与 scp 相同：目标不存在，所以它成为 dist 的副本。',
+    states: { new: '新增', replaced: '替换', kept: '未改动' },
+  },
+});
 
 const tool = ref(props.initial);
 const exists = ref(false);
@@ -49,8 +107,8 @@ const outcome = computed<{ rows?: Row[]; error?: string; note: string }>(() => {
   ];
   if (intoDir.value && !exists.value) {
     return {
-      error: 'Fails: /var/www/app does not exist.',
-      note: 'A trailing slash means "into this directory", so the directory has to exist already.',
+      error: t.value.missing,
+      note: t.value.missingNote,
     };
   }
   if (intoDir.value) {
@@ -63,7 +121,7 @@ const outcome = computed<{ rows?: Row[]; error?: string; note: string }>(() => {
         { depth: 2, name: 'dist', dir: true, state: 'new' },
         ...copied(3, false),
       ],
-      note: 'Like scp: the target is an existing directory, so dist is copied into it.',
+      note: t.value.into,
     };
   }
   return {
@@ -74,45 +132,39 @@ const outcome = computed<{ rows?: Row[]; error?: string; note: string }>(() => {
       ...(exists.value ? [{ depth: 2, name: 'old.html', state: 'kept' as const }] : []),
     ],
     note:
-      tool.value === 'library'
-        ? exists.value
-          ? 'The destination is exact. /var/www/app gets the contents of dist; files with the same name are replaced and other files stay.'
-          : 'The destination is exact. /var/www/app becomes a copy of dist. Its parent, /var/www, must exist.'
-        : 'Like scp: the target does not exist, so it becomes a copy of dist.',
+      tool.value === 'library' ? (exists.value ? t.value.merge : t.value.exact) : t.value.cliCopy,
   };
 });
-
-const labels: Record<State, string> = { new: 'new', replaced: 'replaced', kept: 'untouched' };
 </script>
 
 <template>
   <div class="demo">
     <div class="controls">
-      <div class="group" role="radiogroup" aria-label="Tool">
+      <div class="group" role="radiogroup" :aria-label="t.tool">
         <button :class="{ on: tool === 'library' }" @click="tool = 'library'">client.upload()</button>
-        <button :class="{ on: tool === 'cli' }" @click="tool = 'cli'">CLI and GitHub Action</button>
+        <button :class="{ on: tool === 'cli' }" @click="tool = 'cli'">{{ t.cli }}</button>
       </div>
-      <label><input v-model="exists" type="checkbox" /> /var/www/app already exists</label>
-      <label v-if="tool === 'cli'"><input v-model="slash" type="checkbox" /> trailing slash on the target</label>
+      <label><input v-model="exists" type="checkbox" /> {{ t.exists }}</label>
+      <label v-if="tool === 'cli'"><input v-model="slash" type="checkbox" /> {{ t.slash }}</label>
     </div>
 
     <code class="command">{{ command }}</code>
 
     <div class="trees">
       <div class="tree">
-        <div class="title">Your machine</div>
+        <div class="title">{{ t.local }}</div>
         <div v-for="row in local" :key="row.name + row.depth" class="row" :style="{ paddingLeft: `${row.depth * 18}px` }">
           <span class="icon">{{ row.dir ? '📁' : '📄' }}</span>{{ row.name }}
         </div>
       </div>
       <div class="tree">
-        <div class="title">Server before</div>
+        <div class="title">{{ t.before }}</div>
         <div v-for="row in before" :key="row.name + row.depth" class="row" :style="{ paddingLeft: `${row.depth * 18}px` }">
           <span class="icon">{{ row.dir ? '📁' : '📄' }}</span>{{ row.name }}
         </div>
       </div>
       <div class="tree result">
-        <div class="title">Server after</div>
+        <div class="title">{{ t.after }}</div>
         <div v-if="outcome.error" class="error">{{ outcome.error }}</div>
         <div
           v-for="(row, i) in outcome.rows ?? []"
@@ -122,7 +174,7 @@ const labels: Record<State, string> = { new: 'new', replaced: 'replaced', kept: 
           :style="{ paddingLeft: `${row.depth * 18}px` }"
         >
           <span class="icon">{{ row.dir ? '📁' : '📄' }}</span>{{ row.name }}
-          <span v-if="row.state" class="tag">{{ labels[row.state] }}</span>
+          <span v-if="row.state" class="tag">{{ t.states[row.state] }}</span>
         </div>
       </div>
     </div>

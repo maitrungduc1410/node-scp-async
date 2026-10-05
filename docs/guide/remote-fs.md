@@ -1,3 +1,7 @@
+---
+description: "Remote file operations in node-scp over SFTP: exists, stat, list, mkdir, rm, rename and realpath, plus the raw SFTP session and running commands over SSH."
+---
+
 # Remote filesystem
 
 Over SFTP, `client.fs` gives you the everyday file operations on the server. SCP can only copy
@@ -18,10 +22,10 @@ instead of later when you reach for `client.fs`.
 
 | Method | Does | Resolves to |
 | --- | --- | --- |
-| `exists(path)` | Checks what is at `path` | `'file'`, `'directory'`, `'symlink'`, `'other'` or `false` |
+| `exists(path)` | Checks what is at `path`, following symlinks; `'symlink'` means a link whose target is missing | `'file'`, `'directory'`, `'symlink'`, `'other'` or `false` |
 | `stat(path)` | Details, following symlinks | `{ type, size, mode, uid, gid, atime, mtime }` |
 | `lstat(path)` | Details of a symlink itself | same as `stat` |
-| `list(path)` | Directory entries, sorted by name, without `.` and `..` | an array of `stat` results plus `name` |
+| `list(path)` | Directory entries, sorted by name, without `.` and `..`; symlinks are not followed | an array of `lstat` results plus `name` |
 | `mkdir(path, { recursive, mode })` | Creates a directory; `recursive` works like `mkdir -p` | nothing |
 | `rm(path, { recursive, force })` | Deletes a file, a symlink or, with `recursive`, a directory tree; `force` ignores missing paths | nothing |
 | `rename(from, to)` | Moves or renames | nothing |
