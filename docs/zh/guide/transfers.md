@@ -102,7 +102,7 @@ await download('root@192.168.1.1:/etc/config', './backup/config', { recursive: t
 | `user@host:relative/path` | 相对于登录目录的路径 |
 | `{ host, port, username, path }` | 对象形式，适合已经拿到各个部分的情况 |
 
-如果要自己开发工具，可以用 [`parseTarget()` 和 `formatTarget()`](/api/node-scp/functions/parseTarget) 在字符串和对象两种形式之间转换。`user@host:path` 这种写法没有端口的位置，所以 `formatTarget()` 会省略端口。
+如果要自己开发工具，可以用 [`parseTarget()` 和 `formatTarget()`](/api/functions/parseTarget) 在字符串和对象两种形式之间转换。`user@host:path` 这种写法没有端口的位置，所以 `formatTarget()` 会省略端口。
 
 ## 下一步 {#next}
 

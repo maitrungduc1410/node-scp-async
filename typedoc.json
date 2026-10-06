@@ -3,7 +3,11 @@
   "name": "node-scp",
   "entryPoints": ["src/index.ts", "src/legacy/index.ts", "src/scp2/index.ts"],
   "out": "docs/api",
-  "plugin": ["typedoc-plugin-markdown", "typedoc-vitepress-theme"],
+  "plugin": [
+    "typedoc-plugin-markdown",
+    "typedoc-vitepress-theme",
+    "./docs/typedoc-project-comment.mjs"
+  ],
   "docsRoot": "docs",
   "readme": "none",
   "entryFileName": "index",

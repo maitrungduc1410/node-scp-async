@@ -182,7 +182,7 @@ function localeOf(page: string): SeoLocale {
   return first === 'vi' || first === 'zh' ? first : 'root';
 }
 
-/** `vi/guide/index.md` -> `vi/guide/`, `api/node-scp/functions/connect.md` -> `api/...connect`. */
+/** `vi/guide/index.md` -> `vi/guide/`, `api/functions/connect.md` -> `api/functions/connect`. */
 function pageUrl(page: string): string {
   return page.replace(/(^|\/)index\.md$/, '$1').replace(/\.md$/, '');
 }
@@ -234,9 +234,15 @@ function apiDescription(relativePath: string): string | undefined {
   if (relativePath === 'api/index.md') {
     return 'API reference for node-scp, node-scp/legacy and node-scp/scp2: every exported function, class, option interface and error code, generated from the source.';
   }
-  const m = relativePath.match(/^api\/(node-scp(?:\/legacy|\/scp2)?)\/(?:([\w-]+)\/)?([^/]+)\.md$/);
+  const m = relativePath.match(/^api\/(?:(legacy|scp2)\/)?(?:([\w-]+)\/)?([^/]+)\.md$/);
   if (!m) return undefined;
-  const [, module, kind, name] = m as unknown as [string, string, string | undefined, string];
+  const [, sub, kind, name] = m as unknown as [
+    string,
+    string | undefined,
+    string | undefined,
+    string,
+  ];
+  const module = sub ? `node-scp/${sub}` : 'node-scp';
   const summary = summaryOf(relativePath);
   if (kind === undefined) {
     return clamp(`API reference for the ${module} module. ${summary}`, 'module');

@@ -179,4 +179,4 @@ try {
 | `signal` | | 取消连接过程。 |
 | `beforeConnect` | | 在连接之前接收 ssh2 客户端，用于添加 `keyboard-interactive` 或 `banner` 等监听器。 |
 
-完整的选项列表（包括继承自 ssh2 的所有选项）见 [`ConnectOptions` 参考](/api/node-scp/interfaces/ConnectOptions)。
+完整的选项列表（包括继承自 ssh2 的所有选项）见 [`ConnectOptions` 参考](/api/interfaces/ConnectOptions)。

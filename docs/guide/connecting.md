@@ -186,4 +186,4 @@ try {
 | `beforeConnect` | | Receives the ssh2 client before it connects, to add listeners such as `keyboard-interactive` or `banner`. |
 
 The full list, including every inherited ssh2 option, is in the
-[`ConnectOptions` reference](/api/node-scp/interfaces/ConnectOptions).
+[`ConnectOptions` reference](/api/interfaces/ConnectOptions).

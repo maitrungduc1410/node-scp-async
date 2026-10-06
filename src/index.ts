@@ -8,7 +8,8 @@
  * await client.upload('./dist', '/var/www/app', { recursive: true });
  * ```
  *
- * @module node-scp
+ * @packageDocumentation
+ * @mergeModuleWith <project>
  */
 import { connect, ScpClient } from './client';
 import { ErrorCode, ScpError } from './errors';

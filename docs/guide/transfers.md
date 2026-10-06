@@ -109,7 +109,7 @@ The options object takes connection options and transfer options together. Accep
 | `user@host:relative/path` | a path relative to the login directory |
 | `{ host, port, username, path }` | an object, when you already have the parts |
 
-[`parseTarget()` and `formatTarget()`](/api/node-scp/functions/parseTarget) convert between the
+[`parseTarget()` and `formatTarget()`](/api/functions/parseTarget) convert between the
 string and the object form if you build your own tooling. The `user@host:path` form has no place
 for a port, so `formatTarget()` leaves it out.
 

@@ -113,7 +113,7 @@ Object tùy chọn nhận cả tùy chọn kết nối lẫn tùy chọn truyề
 | `user@host:relative/path` | đường dẫn tương đối so với thư mục đăng nhập |
 | `{ host, port, username, path }` | một object, khi bạn đã có sẵn từng phần |
 
-[`parseTarget()` và `formatTarget()`](/api/node-scp/functions/parseTarget) chuyển đổi giữa dạng
+[`parseTarget()` và `formatTarget()`](/api/functions/parseTarget) chuyển đổi giữa dạng
 chuỗi và dạng object nếu bạn tự xây công cụ riêng. Dạng `user@host:path` không có chỗ cho port,
 nên `formatTarget()` sẽ bỏ port đi.
 

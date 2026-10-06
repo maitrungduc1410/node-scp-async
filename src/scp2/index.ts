@@ -9,7 +9,7 @@
  * Unlike `scp2` it works with servers that only speak SCP, such as Dropbear on OpenWrt, and it
  * returns a promise when no callback is given.
  *
- * @module node-scp/scp2
+ * @module scp2
  */
 import { EventEmitter } from 'node:events';
 import { stat } from 'node:fs/promises';

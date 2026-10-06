@@ -188,4 +188,4 @@ try {
 | `beforeConnect` | | Nhận client ssh2 trước khi kết nối, để gắn listener như `keyboard-interactive` hoặc `banner`. |
 
 Danh sách đầy đủ, gồm cả mọi tùy chọn kế thừa từ ssh2, có trong
-[tài liệu `ConnectOptions`](/api/node-scp/interfaces/ConnectOptions).
+[tài liệu `ConnectOptions`](/api/interfaces/ConnectOptions).
