@@ -186,8 +186,8 @@ importers:
         specifier: ^12.2.0
         version: 12.2.0(supports-color@7.2.0)
       '@types/node':
-        specifier: ^24.0.0
-        version: 24.19.0
+        specifier: ^26.6.4
+        version: 26.6.4
       '@types/ssh2-sftp-client':
         specifier: ^9.0.6
         version: 9.0.6
@@ -229,10 +229,10 @@ importers:
         version: 6.0.3
       vitepress:
         specifier: ^1.6.4
-        version: 1.6.4(@algolia/client-search@5.59.0)(@types/node@24.19.0)(lightningcss@1.33.0)(postcss@8.5.28)(search-insights@2.17.3)(typescript@6.0.3)
+        version: 1.6.4(@algolia/client-search@5.59.0)(@types/node@26.6.4)(lightningcss@1.33.0)(postcss@8.5.28)(search-insights@2.17.3)(typescript@6.0.3)
       vitest:
         specifier: ^5.0.2
-        version: 5.0.2(@types/node@24.19.0)(@vitest/coverage-v8@5.0.2)(vite@8.3.1(@types/node@24.19.0)(yaml@2.9.1))
+        version: 5.0.2(@types/node@26.6.4)(@vitest/coverage-v8@5.0.2)(vite@8.3.1(@types/node@26.6.4)(yaml@2.9.1))
       vue:
         specifier: ^3.5.43
         version: 3.5.43(typescript@6.0.3)
@@ -1194,6 +1194,9 @@ packages:
 
   '@types/node@24.19.0':
     resolution: {integrity: sha512-zY+5tKxXdhGh1PYI0ac+7juvEu4OI6vWtVVoj5i2m42jxAY1U+zHGt6QCyOFwykdP62sM3MJ9stoYYUw5aCWew==}
+
+  '@types/node@26.6.4':
+    resolution: {integrity: sha512-ldVPDCzj7fsaGZrLB0NuHuTvJcsNasysBAqMolr/cgxrLd1xbqxIr3XJiPnHHJUCxj5sNF1vnRj9aWnrVh5Jcg==}
 
   '@types/ssh2-sftp-client@9.0.6':
     resolution: {integrity: sha512-4+KvXO/V77y9VjI2op2T8+RCGI/GXQAwR0q5Qkj/EJ5YSeyKszqZP6F8i3H3txYoBqjc7sgorqyvBP3+w1EHyg==}
@@ -2889,6 +2892,9 @@ packages:
   undici-types@7.24.6:
     resolution: {integrity: sha512-WRNW+sJgj5OBN4/0JpHFqtqzhpbnV0GuB+OozA9gCL7a993SmU+1JBZCzLNxYsbMfIeDL+lTsphD5jN5N+n0zg==}
 
+  undici-types@8.9.0:
+    resolution: {integrity: sha512-KTDyRTYX8sWmKXAikPHHSyc63CRPETMctyjKFupcC6OBLXT3xsN0e9aF7m+mIXutFWpUXuedtowG7iLOzp0kQg==}
+
   undici@8.11.2:
     resolution: {integrity: sha512-u4UB2/IrKdU6lFxumHmmo1a3fCQO5tzQllRorfoRS63txhrB7xTpSn1PftwC4qEHkOaqP95fCWW4lJzwErwzhQ==}
     engines: {node: '>=22.19.0'}
@@ -4040,6 +4046,10 @@ snapshots:
     dependencies:
       undici-types: 7.24.6
 
+  '@types/node@26.6.4':
+    dependencies:
+      undici-types: 8.9.0
+
   '@types/ssh2-sftp-client@9.0.6':
     dependencies:
       '@types/ssh2': 1.15.6
@@ -4071,9 +4081,9 @@ snapshots:
       d3-selection: 3.0.0
       d3-transition: 3.0.1(d3-selection@3.0.0)
 
-  '@vitejs/plugin-vue@5.2.4(vite@5.4.21(@types/node@24.19.0)(lightningcss@1.33.0))(vue@3.5.43(typescript@6.0.3))':
+  '@vitejs/plugin-vue@5.2.4(vite@5.4.21(@types/node@26.6.4)(lightningcss@1.33.0))(vue@3.5.43(typescript@6.0.3))':
     dependencies:
-      vite: 5.4.21(@types/node@24.19.0)(lightningcss@1.33.0)
+      vite: 5.4.21(@types/node@26.6.4)(lightningcss@1.33.0)
       vue: 3.5.43(typescript@6.0.3)
 
   '@vitest/coverage-v8@5.0.2(vitest@5.0.2)':
@@ -4086,7 +4096,7 @@ snapshots:
       obug: 2.2.1
       std-env: 4.2.0
       tinyrainbow: 3.1.1
-      vitest: 5.0.2(@types/node@24.19.0)(@vitest/coverage-v8@5.0.2)(vite@8.3.1(@types/node@24.19.0)(yaml@2.9.1))
+      vitest: 5.0.2(@types/node@26.6.4)(@vitest/coverage-v8@5.0.2)(vite@8.3.1(@types/node@26.6.4)(yaml@2.9.1))
 
   '@vitest/istanbul-lib-coverage@1.0.2': {}
 
@@ -4094,14 +4104,14 @@ snapshots:
     dependencies:
       '@vitest/istanbul-lib-coverage': 1.0.2
 
-  '@vitest/mocker@5.0.2(vite@8.3.1(@types/node@24.19.0)(yaml@2.9.1))':
+  '@vitest/mocker@5.0.2(vite@8.3.1(@types/node@26.6.4)(yaml@2.9.1))':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       '@vitest/spy': 5.0.2
       estree-walker: 3.0.3
       magic-string: 1.4.2
     optionalDependencies:
-      vite: 8.3.1(@types/node@24.19.0)(yaml@2.9.1)
+      vite: 8.3.1(@types/node@26.6.4)(yaml@2.9.1)
 
   '@vitest/spy@5.0.2': {}
 
@@ -5771,6 +5781,8 @@ snapshots:
 
   undici-types@7.24.6: {}
 
+  undici-types@8.9.0: {}
+
   undici@8.11.2: {}
 
   unicode-emoji-modifier-base@1.0.0: {}
@@ -5816,17 +5828,17 @@ snapshots:
       '@types/unist': 3.0.3
       vfile-message: 4.0.3
 
-  vite@5.4.21(@types/node@24.19.0)(lightningcss@1.33.0):
+  vite@5.4.21(@types/node@26.6.4)(lightningcss@1.33.0):
     dependencies:
       esbuild: 0.21.5
       postcss: 8.5.28
       rollup: 4.63.5
     optionalDependencies:
-      '@types/node': 24.19.0
+      '@types/node': 26.6.4
       fsevents: 2.3.3
       lightningcss: 1.33.0
 
-  vite@8.3.1(@types/node@24.19.0)(yaml@2.9.1):
+  vite@8.3.1(@types/node@26.6.4)(yaml@2.9.1):
     dependencies:
       lightningcss: 1.33.0
       picomatch: 4.0.7
@@ -5834,11 +5846,11 @@ snapshots:
       rolldown: 1.2.11
       tinyglobby: 0.2.17
     optionalDependencies:
-      '@types/node': 24.19.0
+      '@types/node': 26.6.4
       fsevents: 2.3.3
       yaml: 2.9.1
 
-  vitepress@1.6.4(@algolia/client-search@5.59.0)(@types/node@24.19.0)(lightningcss@1.33.0)(postcss@8.5.28)(search-insights@2.17.3)(typescript@6.0.3):
+  vitepress@1.6.4(@algolia/client-search@5.59.0)(@types/node@26.6.4)(lightningcss@1.33.0)(postcss@8.5.28)(search-insights@2.17.3)(typescript@6.0.3):
     dependencies:
       '@docsearch/css': 3.8.2
       '@docsearch/js': 3.8.2(@algolia/client-search@5.59.0)(search-insights@2.17.3)
@@ -5847,7 +5859,7 @@ snapshots:
       '@shikijs/transformers': 2.5.0
       '@shikijs/types': 2.5.0
       '@types/markdown-it': 14.2.0
-      '@vitejs/plugin-vue': 5.2.4(vite@5.4.21(@types/node@24.19.0)(lightningcss@1.33.0))(vue@3.5.43(typescript@6.0.3))
+      '@vitejs/plugin-vue': 5.2.4(vite@5.4.21(@types/node@26.6.4)(lightningcss@1.33.0))(vue@3.5.43(typescript@6.0.3))
       '@vue/devtools-api': 7.7.10
       '@vue/shared': 3.5.43
       '@vueuse/core': 12.8.2(typescript@6.0.3)
@@ -5856,7 +5868,7 @@ snapshots:
       mark.js: 8.11.1
       minisearch: 7.2.0
       shiki: 2.5.0
-      vite: 5.4.21(@types/node@24.19.0)(lightningcss@1.33.0)
+      vite: 5.4.21(@types/node@26.6.4)(lightningcss@1.33.0)
       vue: 3.5.43(typescript@6.0.3)
     optionalDependencies:
       postcss: 8.5.28
@@ -5888,10 +5900,10 @@ snapshots:
       - typescript
       - universal-cookie
 
-  vitest@5.0.2(@types/node@24.19.0)(@vitest/coverage-v8@5.0.2)(vite@8.3.1(@types/node@24.19.0)(yaml@2.9.1)):
+  vitest@5.0.2(@types/node@26.6.4)(@vitest/coverage-v8@5.0.2)(vite@8.3.1(@types/node@26.6.4)(yaml@2.9.1)):
     dependencies:
       '@types/chai': 5.2.3
-      '@vitest/mocker': 5.0.2(vite@8.3.1(@types/node@24.19.0)(yaml@2.9.1))
+      '@vitest/mocker': 5.0.2(vite@8.3.1(@types/node@26.6.4)(yaml@2.9.1))
       chai: 6.2.2
       es-module-lexer: 2.3.2
       expect-type: 1.4.0
@@ -5902,10 +5914,10 @@ snapshots:
       tinybench: 6.2.0
       tinyexec: 1.3.1
       tinyglobby: 0.2.17
-      vite: 8.3.1(@types/node@24.19.0)(yaml@2.9.1)
+      vite: 8.3.1(@types/node@26.6.4)(yaml@2.9.1)
       why-is-node-running: 3.2.2
     optionalDependencies:
-      '@types/node': 24.19.0
+      '@types/node': 26.6.4
       '@vitest/coverage-v8': 5.0.2(vitest@5.0.2)
     transitivePeerDependencies:
       - msw
